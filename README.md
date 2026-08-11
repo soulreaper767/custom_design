@@ -110,6 +110,24 @@ Already-installed sites pick this up automatically too: pulling this
 update and running `bench migrate` runs the same sync via a patch (see
 `custom_design/patches.txt`), it isn't limited to fresh installs.
 
+### Icons
+
+- **This app's own icons** — the Custom Design workspace and its Design
+  Settings shortcut now use Frappe's "Purple" indicator color instead of
+  plain grey/blue, closer to the brand's indigo.
+- **Sidebar module icons** — Selling, Buying, Stock, Accounts, CRM,
+  Assets, Projects, and Support each get their own color from a
+  colorblind-safe 8-hue categorical palette (validated with the dataviz
+  skill's contrast/CVD checker against this app's actual sidebar
+  background, not just eyeballed). Deliberately capped at 8 — any module
+  past those isn't recolored rather than reusing a hue or guessing a 9th
+  one, since that would undermine the whole point of a validated set.
+  Targeted by each module's public route (`/app/selling`, etc.) rather
+  than sidebar DOM/class names, since those are far more likely to change
+  between Frappe versions (see the sidebar caveat below) — if a given
+  site's icons don't pick up color, it's a harmless no-op, not a broken
+  layout, and the module's text label is unaffected either way.
+
 ### Advanced / Escape Hatch
 
 `Custom CSS` and `Custom JS` fields exist for anything the structured

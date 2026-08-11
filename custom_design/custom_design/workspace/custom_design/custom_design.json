@@ -8,7 +8,7 @@
  "hide_custom": 0,
  "icon": "settings",
  "idx": 0,
- "indicator_color": "blue",
+ "indicator_color": "purple",
  "is_hidden": 0,
  "label": "Custom Design",
  "links": [],
@@ -28,7 +28,7 @@
  "sequence_id": 1.0,
  "shortcuts": [
   {
-   "color": "Grey",
+   "color": "Purple",
    "doc_view": "",
    "format": "",
    "icon": "settings",

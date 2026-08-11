@@ -241,3 +241,33 @@ html.dark[data-cd-theme="on"] .text-danger,
 html.dark[data-cd-theme="on"] .indicator.red {
 	color: var(--cd-dark-danger) !important;
 }
+
+/* Per-module sidebar icon colors: an 8-hue colorblind-safe categorical set
+   (fixed assignment, never cycled - see the dataviz skill's color-formula),
+   validated against this file's own --cd-sidebar-bg/--cd-dark-sidebar-bg
+   surfaces rather than assumed. Targeted by each module's public route
+   (/app/selling, etc.) rather than by internal sidebar markup/class names,
+   since routes are a stable, version-independent contract while v16's
+   sidebar internals are new (see the README's sidebar caveat) - so this
+   degrades gracefully (no color, not a broken layout) if a given site's
+   sidebar DOM doesn't expose the icon as a currentColor SVG the way Desk
+   normally does. Deliberately capped at 8: a 9th color would either
+   reuse a hue (misleading) or fall outside the validated set, so any
+   module past these 8 is left uncolored rather than guessing a 9th hue -
+   the same "fold into Other" rule the palette validator itself applies. */
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] { color: #2a78d6; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] { color: #eb6834; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] { color: #1baf7a; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] { color: #eda100; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] { color: #e87ba4; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] { color: #008300; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] { color: #4a3aa7; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] { color: #e34948; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] { color: #3987e5; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] { color: #d95926; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] { color: #199e70; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] { color: #c98500; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] { color: #d55181; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] { color: #008300; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] { color: #9085e9; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] { color: #e66767; }

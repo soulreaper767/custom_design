@@ -16,9 +16,3 @@ boot_session = "custom_design.boot.boot_session"
 # Creates the default Design Settings record (already brand-colored via the
 # DocType's own field defaults) and seeds the default chart color palette.
 after_install = "custom_design.install.after_install"
-
-doc_events = {
-	"Design Settings": {
-		"on_update": "custom_design.custom_design.doctype.design_settings.design_settings.clear_cache_on_update"
-	}
-}

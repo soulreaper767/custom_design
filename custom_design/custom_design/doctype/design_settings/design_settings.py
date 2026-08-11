@@ -8,7 +8,3 @@ class DesignSettings(Document):
 		# cache here means the very next page load anywhere picks up changes
 		# without requiring a bench restart.
 		frappe.clear_cache()
-
-
-def clear_cache_on_update(doc, method=None):
-	frappe.clear_cache()

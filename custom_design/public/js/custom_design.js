@@ -125,6 +125,43 @@
 		});
 	}
 
+	// Best-effort icon swap for a sidebar/menu item matched by
+	// applySidebarOverrides. Two input shapes are accepted in the same
+	// field: a URL/path (anything containing "/" or ".") renders as an
+	// <img>, replacing whatever icon element is found; anything else is
+	// treated as a Frappe built-in icon name and applied through both
+	// icon mechanisms Frappe uses depending on version/context - the
+	// older <use href="#icon-x"> sprite reference, and the newer
+	// mask-image-based lucide-x utility class - since there's no reliable
+	// way to know which one a given element uses without inspecting it
+	// live. Whichever doesn't apply is a harmless no-op.
+	function applyIconOverride(el, newIcon) {
+		if (!newIcon) return;
+		const iconEl = el.querySelector(".icon, .es-icon, svg, .sidebar-item-icon, img");
+		if (!iconEl) return;
+
+		if (/[./]/.test(newIcon)) {
+			const img = document.createElement("img");
+			img.src = newIcon;
+			img.className = iconEl.className || "icon";
+			img.style.width = "1em";
+			img.style.height = "1em";
+			img.style.objectFit = "contain";
+			iconEl.replaceWith(img);
+			return;
+		}
+
+		const use = iconEl.tagName === "svg" ? iconEl.querySelector("use") : el.querySelector("svg use");
+		if (use) {
+			use.setAttribute("href", `#icon-${newIcon}`);
+			use.setAttribute("xlink:href", `#icon-${newIcon}`);
+		}
+		Array.prototype.slice.call(iconEl.classList).forEach((c) => {
+			if (c.indexOf("lucide-") === 0) iconEl.classList.remove(c);
+		});
+		iconEl.classList.add(`lucide-${newIcon}`);
+	}
+
 	function applySidebarOverrides() {
 		const overrides = (window.custom_design && window.custom_design._overrides) || [];
 		const hiddenModules = (window.custom_design && window.custom_design._hiddenModules) || [];
@@ -156,6 +193,7 @@
 				}
 				if (override.new_icon) {
 					el.setAttribute("data-cd-icon-override", override.new_icon);
+					applyIconOverride(el, override.new_icon);
 				}
 			}
 
@@ -175,6 +213,25 @@
 			}, 150);
 		});
 		observer.observe(document.body, { childList: true, subtree: true });
+
+		// Self-healing: data-cd-theme="on" is what gates every rule in
+		// custom_design.css, and it's normally set once at boot - if
+		// anything else on the page ever touches attributes on <html>
+		// (a library resetting them, a stale cached fragment, etc.) and
+		// strips it along the way, colors silently fall back to
+		// unstyled Frappe with no obvious cause. Re-asserting it here
+		// whenever html's own attributes change costs nothing (it's a
+		// no-op if already present) and removes any dependency on this
+		// having been set correctly exactly once at a specific point in
+		// the page lifecycle.
+		const attrObserver = new MutationObserver(() => {
+			if (window.custom_design && window.custom_design._enabled) {
+				if (document.documentElement.getAttribute("data-cd-theme") !== "on") {
+					document.documentElement.setAttribute("data-cd-theme", "on");
+				}
+			}
+		});
+		attrObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-cd-theme", "data-theme"] });
 	}
 
 	function applyTheme(settings) {
@@ -186,8 +243,10 @@
 			window.custom_design._overrides = [];
 			window.custom_design._hiddenModules = [];
 			window.custom_design._appTitle = null;
+			window.custom_design._enabled = false;
 			return;
 		}
+		window.custom_design._enabled = true;
 
 		setVar(root, "--cd-primary", settings.primary_color);
 		setVar(root, "--cd-accent", settings.accent_color);

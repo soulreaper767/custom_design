@@ -262,19 +262,28 @@ html[data-theme="dark"][data-cd-theme="on"] .indicator-pill.blue {
 	color: var(--cd-dark-accent) !important;
 }
 
-/* Cards, widgets, number cards, dashboards */
+/* Cards, number cards, dashboards. Deliberately NOT ".widget" - that's
+   Frappe's generic workspace-widget wrapper class, used for far more than
+   visible cards, including empty spacer/placeholder containers reserved
+   for layout during workspace edit/load. Forcing a visible
+   background+border onto every .widget turned an otherwise-invisible
+   empty one into a large blank colored box - almost certainly the
+   "blank footer" this was reported as. .widget-body is the actual
+   content pane inside a widget and is safe to style; the outer wrapper
+   is not. :not(:empty) is kept as a second guard on the remaining
+   selectors regardless. */
 html[data-cd-theme="on"] .frappe-card,
-html[data-cd-theme="on"] .widget,
-html[data-cd-theme="on"] .dashboard-card,
-html[data-cd-theme="on"] .number-card {
+html[data-cd-theme="on"] .widget-body:not(:empty),
+html[data-cd-theme="on"] .dashboard-card:not(:empty),
+html[data-cd-theme="on"] .number-card:not(:empty) {
 	background-color: var(--cd-card-bg);
 	border-radius: var(--cd-radius);
 	border: 1px solid #e2e8f0;
 }
 html[data-theme="dark"][data-cd-theme="on"] .frappe-card,
-html[data-theme="dark"][data-cd-theme="on"] .widget,
-html[data-theme="dark"][data-cd-theme="on"] .dashboard-card,
-html[data-theme="dark"][data-cd-theme="on"] .number-card {
+html[data-theme="dark"][data-cd-theme="on"] .widget-body:not(:empty),
+html[data-theme="dark"][data-cd-theme="on"] .dashboard-card:not(:empty),
+html[data-theme="dark"][data-cd-theme="on"] .number-card:not(:empty) {
 	background-color: var(--cd-dark-card-bg);
 	border: 1px solid #1e293b;
 }

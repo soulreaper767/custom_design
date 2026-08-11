@@ -71,6 +71,16 @@ def sync_brand_translations(app_title=None):
 	except Exception:
 		frappe.log_error(title="custom_design: email footer sync failed")
 
+	try:
+		_sync_module_labels(enabled, settings)
+	except Exception:
+		frappe.log_error(title="custom_design: module label sync failed")
+
+	try:
+		_sync_login_settings(enabled, settings)
+	except Exception:
+		frappe.log_error(title="custom_design: login settings sync failed")
+
 
 def _sync_translations(enabled, title):
 	languages = frappe.get_all("Language", filters={"enabled": 1}, pluck="name") or []
@@ -102,6 +112,61 @@ def _sync_translations(enabled, title):
 	# after_install elsewhere in this app) busts the cached per-language
 	# translation dict too, so a dedicated cache-clear call isn't needed
 	# here specifically.
+
+
+def _sync_module_labels(enabled, settings):
+	"""Same exact-string Translation upsert as _sync_translations, driven
+	by the admin-editable Module Label Overrides table instead of a fixed
+	word list - lets an admin pick any installed app/module and relabel it
+	globally (sidebar, app switcher, workspace list) without touching the
+	module's actual name, since nothing about routing/permissions/reports
+	depends on the *translated* label, only the real one.
+
+	Doesn't track/clean up rows that were removed from the table between
+	syncs (no stored "previous state" to diff against) - same limitation
+	BRAND_REPLACEMENTS has when an entry is retired, documented there.
+	Deleting the row's Translation record by hand via Desk > Translation
+	fully reverts it if that ever matters."""
+	languages = frappe.get_all("Language", filters={"enabled": 1}, pluck="name") or []
+	if "en" not in languages:
+		languages.append("en")
+
+	for row in settings.module_label_overrides or []:
+		if not row.module or not row.custom_label:
+			continue
+		for lang in languages:
+			existing = frappe.db.get_value(
+				"Translation", {"source_text": row.module, "language": lang}, "name"
+			)
+			if enabled:
+				if existing:
+					frappe.db.set_value("Translation", existing, "translated_text", row.custom_label)
+				else:
+					frappe.get_doc(
+						{
+							"doctype": "Translation",
+							"language": lang,
+							"source_text": row.module,
+							"translated_text": row.custom_label,
+						}
+					).insert(ignore_permissions=True)
+			elif existing:
+				frappe.delete_doc("Translation", existing, ignore_permissions=True, force=True)
+
+
+def _sync_login_settings(enabled, settings):
+	"""Hides Frappe's passwordless "Login with Email Link" button through
+	its own real System Settings field (login_with_email_link - confirmed
+	against frappe/www/login.html, which gates that button on exactly this
+	context variable), not CSS display:none. A direct on/off mapping, not
+	a "only touch if unset" guard like the email footer - this field's
+	entire job is controlling that one System Settings value, so there's
+	no ambiguity about ownership the way there is for a freeform text
+	field an admin might set for unrelated reasons."""
+	system_settings = frappe.get_single("System Settings")
+	should_disable = enabled and bool(settings.get("disable_email_link_login"))
+	system_settings.login_with_email_link = 0 if should_disable else 1
+	system_settings.save(ignore_permissions=True)
 
 
 def seed_default_sidebar_override(settings=None, app_title=None):

@@ -14,6 +14,10 @@
   "sb_login",
   "login_tagline",
   "login_background",
+  "cb_login_1",
+  "disable_email_link_login",
+  "login_footer_html",
+  "login_footer_size",
   "sb_theme",
   "color_scheme_mode",
   "cb_theme_1",
@@ -59,7 +63,10 @@
   "cb_menu_1",
   "hidden_modules",
   "sb_sidebar_overrides",
+  "menu_reference_html",
   "sidebar_overrides",
+  "sb_module_labels",
+  "module_label_overrides",
   "sb_advanced",
   "custom_css",
   "custom_js"
@@ -118,6 +125,31 @@
    "fieldname": "login_background",
    "fieldtype": "Attach Image",
    "label": "Login Background Image"
+  },
+  {
+   "fieldname": "cb_login_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "description": "Hides Frappe's built-in passwordless \"Login with Email Link\" button, via System Settings' own login_with_email_link field - not CSS hiding, so it also stops the option from working if linked to directly.",
+   "fieldname": "disable_email_link_login",
+   "fieldtype": "Check",
+   "label": "Disable \"Login with Email Link\""
+  },
+  {
+   "description": "Replaces the login page's default footer. Plain text or simple HTML (links, spans). Leave blank to keep Frappe's default.",
+   "fieldname": "login_footer_html",
+   "fieldtype": "Code",
+   "label": "Login Footer Content",
+   "options": "HTML"
+  },
+  {
+   "default": "Normal (48px)",
+   "fieldname": "login_footer_size",
+   "fieldtype": "Select",
+   "label": "Login Footer Size",
+   "options": "Compact (32px)\nNormal (48px)\nSpacious (64px)"
   },
   {
    "fieldname": "sb_theme",
@@ -384,11 +416,29 @@
    "label": "Sidebar Link Overrides"
   },
   {
-   "description": "Rename, relink, re-icon, or hide any specific sidebar/menu item by matching its current visible text. Applies across the Desk wherever that label appears.",
+   "fieldname": "menu_reference_html",
+   "fieldtype": "HTML",
+   "options": "<div style=\"font-size: 12px; color: var(--text-muted); line-height: 1.8;\"><b>Common Help/User menu labels</b> (top-right avatar and \"?\" menus) to use as <code>Match Label</code> below - exact text varies a little by Frappe version, so treat this as a starting point and verify against what you actually see:<br><code>About</code> &middot; <code>Keyboard Shortcuts</code> &middot; <code>Documentation</code> &middot; <code>Report an Issue</code> &middot; <code>User Forum</code> &middot; <code>Frappe School</code> &middot; <code>Frappe Support</code> &middot; <code>Toggle Theme</code> &middot; <code>Toggle Full Width</code> &middot; <code>Session Defaults</code> &middot; <code>Reload</code> &middot; <code>View Website</code> &middot; <code>My Settings</code> &middot; <code>Log out</code></div>"
+  },
+  {
+   "description": "Rename, relink, re-icon, or hide any specific sidebar/menu item by matching its current visible text (see the reference list above for common Help/User menu labels). Applies across the Desk wherever that label appears.",
    "fieldname": "sidebar_overrides",
    "fieldtype": "Table",
    "label": "Overrides",
    "options": "Sidebar Link Override"
+  },
+  {
+   "collapsible": 1,
+   "description": "Replace a specific app/module's display label everywhere it's shown in the Desk (sidebar, app switcher, workspace list) - applied the same way as the Frappe/ERPNext text replacement (a Translation record), so it's a display-only change, never a rename of the module itself.",
+   "fieldname": "sb_module_labels",
+   "fieldtype": "Section Break",
+   "label": "App / Module Label Overrides"
+  },
+  {
+   "fieldname": "module_label_overrides",
+   "fieldtype": "Table",
+   "label": "Overrides",
+   "options": "Module Label Override"
   },
   {
    "collapsible": 1,

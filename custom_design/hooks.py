@@ -9,6 +9,14 @@ app_license = "MIT"
 app_include_css = "/assets/custom_design/css/custom_design.css"
 app_include_js = "/assets/custom_design/js/custom_design.js"
 
+# Included on every website/portal page load (login included) - a
+# separate hook from app_include_*, which never reaches these pages at
+# all. login.js/login.css no-op on anything that isn't actually the login
+# page (detected via Frappe's own .for-login wrapper class), so loading
+# them site-wide for website pages is harmless.
+web_include_css = "/assets/custom_design/css/login.css"
+web_include_js = "/assets/custom_design/js/login.js"
+
 # Injects Design Settings into frappe.boot.custom_design so the theme is
 # available client-side immediately on first paint, with no extra API call.
 boot_session = "custom_design.boot.boot_session"

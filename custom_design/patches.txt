@@ -4,3 +4,4 @@ custom_design.patches.v1_0.sync_brand_translations
 custom_design.patches.v1_1.reset_stale_color_defaults
 custom_design.patches.v1_2.seed_default_sidebar_override
 custom_design.patches.v1_3.resync_brand_translations
+custom_design.patches.v1_4.sync_login_and_module_labels

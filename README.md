@@ -69,6 +69,35 @@ current defaults (only if they're still exactly the old shipped default,
 never if you've customized them), new dark-mode fields filled in, brand
 text synced, and the starter sidebar override seeded.
 
+### Postmortem: the oversized blank "footer"
+
+Traced to the "Cards, widgets, number cards" CSS rule matching `.widget` -
+Frappe's generic workspace-widget wrapper class, used for far more than
+visible cards, including empty spacer/placeholder containers reserved for
+layout during workspace edit/load. Forcing a visible `background-color` +
+`border` onto every `.widget` turned an otherwise-invisible empty one into
+a large blank colored box. Fixed by targeting `.widget-body` (the actual
+content pane) instead of the outer `.widget` wrapper, plus a `:not(:empty)`
+guard kept on every card selector as a second line of defense.
+
+### If theme changes still don't stick after a refresh
+
+Client-side, `custom_design.js` now self-heals: a `MutationObserver`
+watches `<html>`'s own attributes and re-asserts `data-cd-theme="on"`
+whenever it's missing, rather than depending on having been set correctly
+exactly once at boot. Server-side, `boot_session` (which supplies the
+theme to every page) is wrapped end-to-end in `try/except` with
+`frappe.log_error()` - if theme settings intermittently fail to apply,
+check **Desk > Error Log** for entries titled "custom_design: boot_session
+failed" to confirm whether that's actually happening, since it's the kind
+of thing (a transient Redis hiccup, for instance) that's easy to suspect
+without a way to verify it currently is or isn't the cause. If refreshes
+still revert after `migrate` + `build` + `clear-cache`, add
+`bench restart` to that sequence too - it's the one step of the four that
+actually restarts every worker process, and is worth ruling out on
+principle even though Frappe's own document cache is Redis-backed (shared
+across workers, not per-process) and should auto-invalidate on save.
+
 ## What Gets Installed Automatically
 
 Nothing manual is needed after `bench install-app` — this is intentional:
@@ -117,10 +146,22 @@ attachment control, nothing requires touching code.
 
 ### Menu / Sidebar Overrides
 
-In the **Sidebar Link Overrides** table: `Match Label` must be the *exact*
+A reference box above the **Sidebar Link Overrides** table lists common
+Help/User menu labels (About, Documentation, Keyboard Shortcuts, Frappe
+Support, etc.) as a starting point for `Match Label` - exact text varies a
+little by Frappe version, so treat it as a hint, not a guarantee, and
+verify against what you actually see. `Match Label` must be the *exact*
 visible text of the item as it currently appears (case and spacing
 sensitive). Leave `New Label`/`New Link` blank to only change one of them.
-Check `Hide This Item Instead` to hide it entirely rather than relabel it.
+Check `Hide This Item Instead` to hide it entirely rather than relabel it -
+this is how you show/hide individual menu items (About, Support, whatever
+else appears in the Help/User dropdowns), the same mechanism as sidebar
+renames, since both are just DOM elements matched by their visible text.
+
+`New Icon` accepts either a built-in Frappe icon name or a full image URL
+(paste an uploaded file's URL) - applied through whichever icon mechanism
+the matched element actually uses, best-effort since there's no reliable
+way to know which one without inspecting the live element.
 
 **Modules** (e.g. hiding entire sections like "CRM" or "Assets" from the
 sidebar/app switcher): use the **Hidden Modules** table instead — pick the
@@ -195,6 +236,52 @@ update and running `bench migrate` runs the same sync via a patch (see
   if a given site's icons still don't pick up color, it's a harmless
   no-op, not a broken layout, and the module's text label is unaffected
   either way.
+
+### App / Module Label Overrides
+
+A separate table from Sidebar Link Overrides, for a different job: pick
+any installed app/module by its actual `Module Def` record and give it a
+custom display label, applied globally (sidebar, app switcher, workspace
+list) via a `Translation` record - the exact same non-hard-coded mechanism
+as the Frappe/ERPNext text replacement, just driven by this table instead
+of a fixed word list. This only ever changes the *label* - nothing about
+the module's real name, routes, permissions, or reports is touched, so
+nothing that depends on those breaks.
+
+### Login Page
+
+Everything here needed its own delivery mechanism (`web_include_css`/
+`web_include_js`, a new `login.css`/`login.js`) since Desk's
+`app_include_css`/`app_include_js` never reach the login page at all - a
+gap this app had for every earlier release. `login.js` only activates once
+it confirms it's actually looking at the login page (Frappe's own
+`.for-login` wrapper class), so loading it on every website page is
+harmless. Config reaches it through a small guest-allowed API endpoint
+(`custom_design.api.get_login_settings`) - the login page is
+unauthenticated, so there's no session yet to read settings from the way
+the Desk-side script does, and that endpoint deliberately returns only
+display fields, never `Custom CSS`/`Custom JS`/sidebar overrides or
+anything else scoped to the authenticated Desk.
+
+- **Disable "Login with Email Link"** (default: on) - turns off Frappe's
+  built-in passwordless login button through its own real System Settings
+  field (`login_with_email_link`, confirmed against
+  `frappe/www/login.html`'s actual gating condition), not CSS
+  `display:none` - so the option is actually disabled, not just hidden
+  while still reachable by a direct link.
+- **Matches the frontend's design** - white/near-black card
+  (`.page-card`, Frappe's own real class) on a neutral canvas, indigo
+  primary button, rounded corners, dark mode included - the same tokens
+  the rest of this app uses, not a separate palette.
+- **Application Name** now shows properly on the login page itself - a
+  small title (+ **Login Page Tagline**, if set) injected just above the
+  existing "Sign In" heading, never replacing it, since "Sign In" is a
+  functional instruction, not a brand string.
+- **Login Footer Content** - free HTML, replaces the (nonexistent by
+  default - Frappe's login page doesn't ship one) footer. **Login Footer
+  Size** sets a minimum height (Compact/Normal/Spacious) without clipping
+  longer content, since a footer should size to its content, not the
+  other way around.
 
 ### Advanced / Escape Hatch
 

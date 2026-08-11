@@ -1,0 +1,94 @@
+/* custom_design: login page theme. Loaded on every website/portal page via
+   web_include_css (app_include_css only reaches Desk, never login - see
+   README), so everything here is scoped to .cd-login-active on <body>,
+   set by login.js only once it confirms this actually is the login page.
+   Selectors below (.for-login, .page-card, .page-card-head, .app-logo,
+   .form-signin) are Frappe's own real classes from frappe/www/login.html,
+   not guessed. */
+
+body.cd-login-active .for-login {
+	background-color: var(--cd-login-bg, #f8fafc);
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+body.cd-login-active .page-card {
+	background-color: var(--cd-login-card-bg, #ffffff);
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
+}
+body.cd-login-active .page-card-head,
+body.cd-login-active .form-signin,
+body.cd-login-active .page-card {
+	color: var(--cd-login-text, #0f172a);
+}
+body.cd-login-active .btn-primary,
+body.cd-login-active button[type="submit"] {
+	background-color: var(--cd-login-primary, #4f46e5) !important;
+	border-color: var(--cd-login-primary, #4f46e5) !important;
+	border-radius: var(--cd-login-radius, 8px) !important;
+}
+body.cd-login-active .form-control {
+	border-radius: var(--cd-login-radius, 8px) !important;
+}
+body.cd-login-active a {
+	color: var(--cd-login-primary, #4f46e5);
+}
+
+html[data-theme="dark"] body.cd-login-active .for-login {
+	background-color: var(--cd-login-dark-bg, #020617);
+}
+html[data-theme="dark"] body.cd-login-active .page-card {
+	background-color: var(--cd-login-dark-card-bg, #0f172a);
+	border-color: #1e293b;
+}
+html[data-theme="dark"] body.cd-login-active .page-card-head,
+html[data-theme="dark"] body.cd-login-active .form-signin,
+html[data-theme="dark"] body.cd-login-active .page-card {
+	color: var(--cd-login-dark-text, #f1f5f9);
+}
+html[data-theme="dark"] body.cd-login-active .btn-primary,
+html[data-theme="dark"] body.cd-login-active button[type="submit"] {
+	background-color: var(--cd-login-dark-primary, #6366f1) !important;
+	border-color: var(--cd-login-dark-primary, #6366f1) !important;
+}
+html[data-theme="dark"] body.cd-login-active a {
+	color: var(--cd-login-dark-primary, #6366f1);
+}
+
+/* App title/tagline block, injected by login.js just above the existing
+   "Sign In" heading - never replacing it, since that text is a functional
+   instruction, not branding. */
+.cd-login-brand {
+	margin-bottom: 0.5rem;
+}
+.cd-login-brand-title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	margin: 0;
+}
+.cd-login-brand-tagline {
+	font-size: 0.875rem;
+	color: #64748b;
+	margin: 0.125rem 0 0;
+}
+
+/* Custom footer, appended by login.js. Height set by the Login Footer Size
+   select (a min-height, not a fixed height, so longer custom content is
+   never clipped). */
+.cd-login-footer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	width: 100%;
+	padding: 0.5rem 1rem;
+	font-size: 0.75rem;
+	color: #64748b;
+}
+html[data-theme="dark"] .cd-login-footer {
+	color: #94a3b8;
+}

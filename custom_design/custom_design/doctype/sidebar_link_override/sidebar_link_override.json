@@ -43,9 +43,10 @@
    "fieldtype": "Section Break"
   },
   {
+   "description": "Either a built-in Frappe icon name (e.g. \"star\") or a full image URL (e.g. an uploaded file's URL) - best-effort, applied through whichever icon mechanism the matched element actually uses.",
    "fieldname": "new_icon",
    "fieldtype": "Data",
-   "label": "New Icon (Frappe icon name, optional)"
+   "label": "New Icon (icon name or image URL, optional)"
   },
   {
    "default": "0",

@@ -1,5 +1,7 @@
 import frappe
 
+from custom_design.branding import sync_brand_translations
+
 
 def after_install():
 	"""Runs once, right after the app is installed on a site. Design
@@ -25,4 +27,7 @@ def after_install():
 
 	settings.enabled = 1
 	settings.save(ignore_permissions=True)
+
+	sync_brand_translations(settings.app_title)
+
 	frappe.db.commit()

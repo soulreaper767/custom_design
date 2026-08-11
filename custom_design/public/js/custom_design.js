@@ -1,11 +1,17 @@
 // custom_design: applies Design Settings across the whole Desk.
-// Two-layer approach:
+// Three-layer approach:
 //   1. CSS custom properties (--cd-*) are set here and consumed by
 //      custom_design.css and, where names are known, Frappe's own
 //      theme variables are remapped too so native components pick it up.
 //   2. Sidebar/menu label-text overrides are DOM-level, re-applied on every
 //      mutation, since v16's sidebar re-renders dynamically and a one-time
 //      patch would get silently wiped out on the next render.
+//   3. Frappe/ERPNext -> Application Name text substitution: mostly
+//      server-side via Translation records (custom_design.branding), with
+//      a narrowly-scoped DOM pass here (applyBrandText) as a safety net
+//      for the handful of chrome elements that aren't routed through
+//      Frappe's own __() translation layer, e.g. the "Powered by Frappe"
+//      footer link.
 
 (function () {
 	function setVar(root, name, value) {
@@ -40,6 +46,44 @@
 	function toggleVisibility(selector, hide) {
 		document.querySelectorAll(selector).forEach((el) => {
 			el.style.display = hide ? "none" : "";
+		});
+	}
+
+	function replaceBrandWords(text, title) {
+		return text.replace(/\bFrappe\b|\bERPNext\b/g, title);
+	}
+
+	function applyBrandText() {
+		const title = window.custom_design && window.custom_design._appTitle;
+		if (!title) return;
+
+		document.title = replaceBrandWords(document.title, title);
+
+		// Scoped to known branding/chrome locations only - never a
+		// document-wide text walk - so a record whose own name or notes
+		// happen to contain the word "Frappe"/"ERPNext" is never rewritten.
+		// Anything already routed through Frappe's own __() translation
+		// layer is handled server-side (see custom_design.branding); this
+		// is a client-side safety net for chrome that isn't, like the
+		// "Powered by Frappe" footer link.
+		const chromeSelectors = [
+			"a[href*='frappe.io']",
+			"a[href*='frappecloud.com']",
+			"a[href*='erpnext.com']",
+			".frappe-powered-by",
+		].join(", ");
+
+		document.querySelectorAll(chromeSelectors).forEach((el) => {
+			["data-original-title", "title"].forEach((attr) => {
+				const val = el.getAttribute(attr);
+				if (val) el.setAttribute(attr, replaceBrandWords(val, title));
+			});
+
+			Array.prototype.slice.call(el.childNodes).forEach((node) => {
+				if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+					node.textContent = replaceBrandWords(node.textContent, title);
+				}
+			});
 		});
 	}
 
@@ -87,7 +131,10 @@
 	function watchForRerenders() {
 		const observer = new MutationObserver(() => {
 			clearTimeout(debounceTimer);
-			debounceTimer = setTimeout(applySidebarOverrides, 150);
+			debounceTimer = setTimeout(() => {
+				applySidebarOverrides();
+				applyBrandText();
+			}, 150);
 		});
 		observer.observe(document.body, { childList: true, subtree: true });
 	}
@@ -98,6 +145,9 @@
 		if (!settings || Number(settings.enabled) === 0) {
 			root.removeAttribute("data-cd-theme");
 			injectStyleTag("custom-design-custom-css", "");
+			window.custom_design._overrides = [];
+			window.custom_design._hiddenModules = [];
+			window.custom_design._appTitle = null;
 			return;
 		}
 
@@ -150,13 +200,8 @@
 		// "User Choice" modes intentionally leave Frappe's own light/dark
 		// toggle alone rather than forcing a mode.
 
-		if (settings.app_title) {
-			try {
-				document.title = document.title.replace(/Frappe|ERPNext/, settings.app_title);
-			} catch (e) {
-				/* non-fatal */
-			}
-		}
+		window.custom_design._appTitle = settings.app_title || null;
+		applyBrandText();
 
 		if (settings.logo) {
 			document.querySelectorAll(".navbar-brand img, .app-logo img, img.app-logo").forEach((img) => {

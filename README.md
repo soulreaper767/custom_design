@@ -73,6 +73,43 @@ Check `Hide This Item Instead` to hide it entirely rather than relabel it.
 sidebar/app switcher): use the **Hidden Modules** table instead — pick the
 module by name, not by matching visible text.
 
+### Frappe/ERPNext Branding Text
+
+Setting **Application Name** replaces the words "Frappe" and "ERPNext"
+with that name across the Desk — page titles, tooltips, the "Powered by"
+footer link, and outgoing system emails — the moment you save. No separate
+button or step: saving the form is the trigger, same as every other field
+here.
+
+Two mechanisms do this, both reversible by unchecking **Enable Custom
+Design**:
+
+- **Server-side (does most of the work):** `Translation` records for a
+  curated list of known Frappe/ERPNext strings ("Frappe", "ERPNext",
+  "Powered by Frappe", etc.), which Frappe's own `__()` translation layer
+  then substitutes everywhere it's used — most Desk chrome, tooltips, and
+  system messages. Plus `System Settings.disable_standard_email_footer`
+  so outgoing emails stop appending Frappe's own footer, replaced with
+  one naming your app instead (only touched if you haven't already set a
+  custom email footer yourself).
+- **Client-side (safety net):** a narrowly-scoped DOM pass for the
+  handful of chrome elements that aren't routed through `__()`, like the
+  "Powered by Frappe" footer link specifically. Scoped to known
+  branding/footer elements only — it never touches document data, so a
+  customer name or note that happens to contain the word "ERPNext" is
+  never rewritten.
+
+This is best-effort, not exhaustive: the exact literal strings Frappe
+ships vary a little by version, and a handful of hard-coded email
+templates aren't routed through `__()` at all. If you spot one that
+didn't get replaced, add it yourself the normal way — Desk >
+Translation — no code change needed, this app's own Translation records
+work exactly the same way.
+
+Already-installed sites pick this up automatically too: pulling this
+update and running `bench migrate` runs the same sync via a patch (see
+`custom_design/patches.txt`), it isn't limited to fresh installs.
+
 ### Advanced / Escape Hatch
 
 `Custom CSS` and `Custom JS` fields exist for anything the structured

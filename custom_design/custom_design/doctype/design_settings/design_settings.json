@@ -1,0 +1,341 @@
+{
+ "actions": [],
+ "creation": "2026-08-11 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "sb_branding",
+  "app_title",
+  "logo",
+  "cb_branding_1",
+  "logo_dark",
+  "favicon",
+  "sb_login",
+  "login_tagline",
+  "login_background",
+  "sb_theme",
+  "color_scheme_mode",
+  "cb_theme_1",
+  "font_family",
+  "border_radius",
+  "sb_colors",
+  "primary_color",
+  "accent_color",
+  "background_color",
+  "text_color",
+  "cb_colors_1",
+  "success_color",
+  "danger_color",
+  "dark_background_color",
+  "dark_text_color",
+  "sb_sidebar",
+  "sidebar_background_color",
+  "sidebar_text_color",
+  "sidebar_active_color",
+  "cb_sidebar_1",
+  "navbar_background_color",
+  "navbar_text_color",
+  "sb_dashboard",
+  "number_card_background",
+  "chart_colors",
+  "sb_menu",
+  "hide_help_menu",
+  "hide_notifications",
+  "hide_frappe_branding",
+  "cb_menu_1",
+  "hidden_modules",
+  "sb_sidebar_overrides",
+  "sidebar_overrides",
+  "sb_advanced",
+  "custom_css",
+  "custom_js"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "description": "Master switch. Turn off to instantly revert the whole system to unmodified ERPNext styling.",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable Custom Design"
+  },
+  {
+   "fieldname": "sb_branding",
+   "fieldtype": "Section Break",
+   "label": "Branding"
+  },
+  {
+   "default": "Tijarat",
+   "fieldname": "app_title",
+   "fieldtype": "Data",
+   "label": "Application Name"
+  },
+  {
+   "fieldname": "logo",
+   "fieldtype": "Attach Image",
+   "label": "Logo (Light Mode)"
+  },
+  {
+   "fieldname": "cb_branding_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "logo_dark",
+   "fieldtype": "Attach Image",
+   "label": "Logo (Dark Mode)"
+  },
+  {
+   "fieldname": "favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sb_login",
+   "fieldtype": "Section Break",
+   "label": "Login Page"
+  },
+  {
+   "fieldname": "login_tagline",
+   "fieldtype": "Data",
+   "label": "Login Page Tagline"
+  },
+  {
+   "fieldname": "login_background",
+   "fieldtype": "Attach Image",
+   "label": "Login Background Image"
+  },
+  {
+   "fieldname": "sb_theme",
+   "fieldtype": "Section Break",
+   "label": "Theme & Colors"
+  },
+  {
+   "default": "User Choice (Light Default)",
+   "fieldname": "color_scheme_mode",
+   "fieldtype": "Select",
+   "label": "Color Scheme Mode",
+   "options": "Light\nDark\nUser Choice (Light Default)\nUser Choice (Dark Default)"
+  },
+  {
+   "fieldname": "cb_theme_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Inter",
+   "fieldname": "font_family",
+   "fieldtype": "Select",
+   "label": "Font Family",
+   "options": "Default\nInter\nNoto Sans\nRoboto\nOpen Sans\nSystem UI"
+  },
+  {
+   "default": "Subtle (4px)",
+   "fieldname": "border_radius",
+   "fieldtype": "Select",
+   "label": "Corner Roundness",
+   "options": "Sharp (0px)\nSubtle (4px)\nRounded (8px)\nPill (999px)"
+  },
+  {
+   "fieldname": "sb_colors",
+   "fieldtype": "Section Break",
+   "label": "Core Colors"
+  },
+  {
+   "default": "#16324F",
+   "fieldname": "primary_color",
+   "fieldtype": "Color",
+   "label": "Primary Color (buttons, links)"
+  },
+  {
+   "default": "#C68A2E",
+   "fieldname": "accent_color",
+   "fieldtype": "Color",
+   "label": "Accent Color (highlights, active states)"
+  },
+  {
+   "default": "#F6F1E7",
+   "fieldname": "background_color",
+   "fieldtype": "Color",
+   "label": "Page Background"
+  },
+  {
+   "default": "#23201B",
+   "fieldname": "text_color",
+   "fieldtype": "Color",
+   "label": "Primary Text Color"
+  },
+  {
+   "fieldname": "cb_colors_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "#3E7A5A",
+   "fieldname": "success_color",
+   "fieldtype": "Color",
+   "label": "Success Color"
+  },
+  {
+   "default": "#B84A3E",
+   "fieldname": "danger_color",
+   "fieldtype": "Color",
+   "label": "Danger / Alert Color"
+  },
+  {
+   "default": "#0D1E30",
+   "fieldname": "dark_background_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Background"
+  },
+  {
+   "default": "#F6F1E7",
+   "fieldname": "dark_text_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Text"
+  },
+  {
+   "fieldname": "sb_sidebar",
+   "fieldtype": "Section Break",
+   "label": "Sidebar & Navbar"
+  },
+  {
+   "default": "#16324F",
+   "fieldname": "sidebar_background_color",
+   "fieldtype": "Color",
+   "label": "Sidebar Background"
+  },
+  {
+   "default": "#F6F1E7",
+   "fieldname": "sidebar_text_color",
+   "fieldtype": "Color",
+   "label": "Sidebar Text"
+  },
+  {
+   "default": "#C68A2E",
+   "fieldname": "sidebar_active_color",
+   "fieldtype": "Color",
+   "label": "Sidebar Active / Selected Item"
+  },
+  {
+   "fieldname": "cb_sidebar_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "#16324F",
+   "fieldname": "navbar_background_color",
+   "fieldtype": "Color",
+   "label": "Top Navbar Background"
+  },
+  {
+   "default": "#F6F1E7",
+   "fieldname": "navbar_text_color",
+   "fieldtype": "Color",
+   "label": "Top Navbar Text"
+  },
+  {
+   "fieldname": "sb_dashboard",
+   "fieldtype": "Section Break",
+   "label": "Dashboard & Charts"
+  },
+  {
+   "default": "#FBF3E4",
+   "fieldname": "number_card_background",
+   "fieldtype": "Color",
+   "label": "Number Card Background"
+  },
+  {
+   "description": "Used cyclically for chart series colors across dashboards. Add as many as you like.",
+   "fieldname": "chart_colors",
+   "fieldtype": "Table",
+   "label": "Chart Color Palette",
+   "options": "Design Settings Chart Color"
+  },
+  {
+   "fieldname": "sb_menu",
+   "fieldtype": "Section Break",
+   "label": "Menu & Navigation Control"
+  },
+  {
+   "default": "0",
+   "fieldname": "hide_help_menu",
+   "fieldtype": "Check",
+   "label": "Hide Help Menu"
+  },
+  {
+   "default": "0",
+   "fieldname": "hide_notifications",
+   "fieldtype": "Check",
+   "label": "Hide Notifications Icon"
+  },
+  {
+   "default": "1",
+   "fieldname": "hide_frappe_branding",
+   "fieldtype": "Check",
+   "label": "Hide \"Powered by Frappe\" Branding"
+  },
+  {
+   "fieldname": "cb_menu_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Modules picked here are hidden from the app switcher and workspace sidebar.",
+   "fieldname": "hidden_modules",
+   "fieldtype": "Table",
+   "label": "Hidden Modules",
+   "options": "Hidden Module"
+  },
+  {
+   "fieldname": "sb_sidebar_overrides",
+   "fieldtype": "Section Break",
+   "label": "Sidebar Link Overrides"
+  },
+  {
+   "description": "Rename, relink, re-icon, or hide any specific sidebar/menu item by matching its current visible text. Applies across the Desk wherever that label appears.",
+   "fieldname": "sidebar_overrides",
+   "fieldtype": "Table",
+   "label": "Overrides",
+   "options": "Sidebar Link Override"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sb_advanced",
+   "fieldtype": "Section Break",
+   "label": "Advanced (Escape Hatch)"
+  },
+  {
+   "description": "Injected globally as an inline <style> tag after the generated theme CSS, so it can override anything above.",
+   "fieldname": "custom_css",
+   "fieldtype": "Code",
+   "label": "Custom CSS",
+   "options": "CSS"
+  },
+  {
+   "description": "Executed once per page load, after the theme is applied. Use with care.",
+   "fieldname": "custom_js",
+   "fieldtype": "Code",
+   "label": "Custom JS",
+   "options": "JS"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-08-11 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Custom Design",
+ "name": "Design Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

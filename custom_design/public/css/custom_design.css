@@ -1,0 +1,119 @@
+/* custom_design: base theme stylesheet.
+   Reads the --cd-* custom properties set by custom_design.js at runtime.
+   Fallback values baked into each var() call match Design Settings' own
+   JSON defaults, so styling is correct even before JS finishes running. */
+
+:root {
+	--cd-primary: #16324f;
+	--cd-accent: #c68a2e;
+	--cd-bg: #f6f1e7;
+	--cd-text: #23201b;
+	--cd-success: #3e7a5a;
+	--cd-danger: #b84a3e;
+	--cd-dark-bg: #0d1e30;
+	--cd-dark-text: #f6f1e7;
+	--cd-sidebar-bg: #16324f;
+	--cd-sidebar-text: #f6f1e7;
+	--cd-sidebar-active: #c68a2e;
+	--cd-navbar-bg: #16324f;
+	--cd-navbar-text: #f6f1e7;
+	--cd-card-bg: #fbf3e4;
+	--cd-radius: 4px;
+	--cd-font: "Inter", sans-serif;
+}
+
+html[data-cd-theme="on"] body {
+	background-color: var(--cd-bg);
+	color: var(--cd-text);
+	font-family: var(--cd-font);
+}
+
+/* Navbar */
+html[data-cd-theme="on"] .navbar,
+html[data-cd-theme="on"] .navbar.navbar-default {
+	background-color: var(--cd-navbar-bg) !important;
+	color: var(--cd-navbar-text) !important;
+}
+html[data-cd-theme="on"] .navbar a,
+html[data-cd-theme="on"] .navbar .navbar-brand {
+	color: var(--cd-navbar-text) !important;
+}
+
+/* Sidebar (covers older sidebar classes and v16's workspace sidebar
+   container - both are targeted so the rule applies regardless of which
+   markup is actually present). */
+html[data-cd-theme="on"] .desk-sidebar,
+html[data-cd-theme="on"] .standard-sidebar,
+html[data-cd-theme="on"] .workspace-sidebar,
+html[data-cd-theme="on"] [class*="sidebar"] {
+	background-color: var(--cd-sidebar-bg);
+	color: var(--cd-sidebar-text);
+}
+html[data-cd-theme="on"] .desk-sidebar a,
+html[data-cd-theme="on"] .standard-sidebar a,
+html[data-cd-theme="on"] .workspace-sidebar a {
+	color: var(--cd-sidebar-text);
+}
+html[data-cd-theme="on"] .desk-sidebar .selected,
+html[data-cd-theme="on"] .standard-sidebar .selected,
+html[data-cd-theme="on"] .sidebar-item.selected,
+html[data-cd-theme="on"] [class*="sidebar"] .active {
+	background-color: var(--cd-sidebar-active) !important;
+}
+
+/* Buttons & controls */
+html[data-cd-theme="on"] .btn-primary {
+	background-color: var(--cd-primary) !important;
+	border-color: var(--cd-primary) !important;
+	border-radius: var(--cd-radius) !important;
+}
+html[data-cd-theme="on"] .btn {
+	border-radius: var(--cd-radius) !important;
+}
+html[data-cd-theme="on"] a {
+	color: var(--cd-primary);
+}
+html[data-cd-theme="on"] .indicator.blue,
+html[data-cd-theme="on"] .indicator-pill.blue {
+	background-color: var(--cd-accent);
+}
+
+/* Cards, widgets, number cards, dashboards */
+html[data-cd-theme="on"] .frappe-card,
+html[data-cd-theme="on"] .widget,
+html[data-cd-theme="on"] .dashboard-card,
+html[data-cd-theme="on"] .number-card {
+	background-color: var(--cd-card-bg);
+	border-radius: var(--cd-radius);
+}
+
+/* Form controls follow the same corner-roundness choice for visual
+   consistency with buttons/cards. */
+html[data-cd-theme="on"] .form-control,
+html[data-cd-theme="on"] .input-with-feedback {
+	border-radius: var(--cd-radius);
+}
+
+/* Dark mode overrides - applied when Frappe's own `.dark` class is present
+   on <html>, whether the admin forced it via Color Scheme Mode or the user
+   picked it themselves via Frappe's native toggle. */
+html.dark[data-cd-theme="on"] body {
+	background-color: var(--cd-dark-bg);
+	color: var(--cd-dark-text);
+}
+html.dark[data-cd-theme="on"] .frappe-card,
+html.dark[data-cd-theme="on"] .widget,
+html.dark[data-cd-theme="on"] .number-card {
+	background-color: color-mix(in srgb, var(--cd-dark-bg) 85%, white 15%);
+}
+
+/* Success / danger semantic colors, applied where Frappe uses its own
+   utility classes for these states. */
+html[data-cd-theme="on"] .text-success,
+html[data-cd-theme="on"] .indicator.green {
+	color: var(--cd-success) !important;
+}
+html[data-cd-theme="on"] .text-danger,
+html[data-cd-theme="on"] .indicator.red {
+	color: var(--cd-danger) !important;
+}

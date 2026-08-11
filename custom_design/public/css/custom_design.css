@@ -1,25 +1,81 @@
 /* custom_design: base theme stylesheet.
    Reads the --cd-* custom properties set by custom_design.js at runtime.
    Fallback values baked into each var() call match Design Settings' own
-   JSON defaults, so styling is correct even before JS finishes running. */
+   JSON defaults, so styling is correct even before JS finishes running.
+
+   Dark mode: every interactive/semantic color (primary, accent, success,
+   danger, sidebar/navbar surfaces, card surfaces) has its own literal
+   dark-mode field in Design Settings, mirroring the frontend's own
+   per-mode token choices (src/index.css + components/ui) rather than
+   trying to auto-derive one from the light value - a color tuned for the
+   light parchment/white background usually reads as near-invisible on a
+   dark one (e.g. a raw indigo-600 sits at ~1:1 contrast against a
+   near-black background). Every rule below that needs to differ by mode
+   is written as two rules (base + html.dark override) rather than one
+   rule referencing a variable that silently swaps underneath it, so the
+   light/dark pairing at each call site stays easy to audit. */
 
 :root {
-	--cd-primary: #16324f;
-	--cd-accent: #c68a2e;
-	--cd-bg: #f6f1e7;
-	--cd-text: #23201b;
-	--cd-success: #3e7a5a;
-	--cd-danger: #b84a3e;
-	--cd-dark-bg: #0d1e30;
-	--cd-dark-text: #f6f1e7;
-	--cd-sidebar-bg: #16324f;
-	--cd-sidebar-text: #f6f1e7;
-	--cd-sidebar-active: #c68a2e;
-	--cd-navbar-bg: #16324f;
-	--cd-navbar-text: #f6f1e7;
-	--cd-card-bg: #fbf3e4;
-	--cd-radius: 4px;
+	--cd-primary: #4f46e5;
+	--cd-accent: #4338ca;
+	--cd-bg: #f8fafc;
+	--cd-text: #0f172a;
+	--cd-success: #047857;
+	--cd-danger: #b91c1c;
+
+	--cd-dark-bg: #020617;
+	--cd-dark-text: #f1f5f9;
+	--cd-dark-primary: #6366f1;
+	--cd-dark-accent: #a5b4fc;
+	--cd-dark-success: #10b981;
+	--cd-dark-danger: #ef4444;
+
+	--cd-sidebar-bg: #ffffff;
+	--cd-sidebar-text: #475569;
+	--cd-sidebar-active: #eef2ff;
+	--cd-navbar-bg: #ffffff;
+	--cd-navbar-text: #0f172a;
+
+	--cd-dark-sidebar-bg: #0f172a;
+	--cd-dark-sidebar-text: #cbd5e1;
+	--cd-dark-navbar-bg: #0f172a;
+	--cd-dark-navbar-text: #f1f5f9;
+
+	--cd-card-bg: #ffffff;
+	--cd-dark-card-bg: #0f172a;
+
+	/* Tint used behind selected/active items (sidebar, "blue" indicator
+	   pills). Derived from the primary color rather than exposed as its
+	   own field, since it's a fixed 15%-strength wash rather than a color
+	   an admin would pick directly - color-mix() recomputes it whenever
+	   the underlying primary/surface color changes. */
+	--cd-active-bg: var(--cd-sidebar-active);
+	--cd-dark-active-bg: color-mix(in srgb, var(--cd-dark-primary) 15%, var(--cd-dark-sidebar-bg) 85%);
+
+	--cd-radius: 8px;
 	--cd-font: "Inter", sans-serif;
+}
+
+/* Frappe's own theme variables, remapped from the --cd-* values above so
+   native components pick up the brand colors too. Scoped per mode (rather
+   than set once via JS) so it reacts immediately when html.dark toggles,
+   including via Frappe's own native light/dark switch which this app
+   doesn't control. If a given Frappe release doesn't consume one of these
+   names, it's a harmless no-op - the explicit selectors below still carry
+   the visual weight. */
+html[data-cd-theme="on"] {
+	--bg-color: var(--cd-bg);
+	--text-color: var(--cd-text);
+	--primary: var(--cd-primary);
+	--primary-color: var(--cd-primary);
+	--dt-primary-color: var(--cd-primary);
+}
+html.dark[data-cd-theme="on"] {
+	--bg-color: var(--cd-dark-bg);
+	--text-color: var(--cd-dark-text);
+	--primary: var(--cd-dark-primary);
+	--primary-color: var(--cd-dark-primary);
+	--dt-primary-color: var(--cd-dark-primary);
 }
 
 html[data-cd-theme="on"] body {
@@ -27,16 +83,32 @@ html[data-cd-theme="on"] body {
 	color: var(--cd-text);
 	font-family: var(--cd-font);
 }
+html.dark[data-cd-theme="on"] body {
+	background-color: var(--cd-dark-bg);
+	color: var(--cd-dark-text);
+}
 
-/* Navbar */
+/* Navbar - a plain white/near-black surface with a hairline border, same
+   as the frontend's Topbar, rather than a solid brand-colored bar. */
 html[data-cd-theme="on"] .navbar,
 html[data-cd-theme="on"] .navbar.navbar-default {
 	background-color: var(--cd-navbar-bg) !important;
 	color: var(--cd-navbar-text) !important;
+	border-bottom: 1px solid #e2e8f0;
 }
 html[data-cd-theme="on"] .navbar a,
 html[data-cd-theme="on"] .navbar .navbar-brand {
 	color: var(--cd-navbar-text) !important;
+}
+html.dark[data-cd-theme="on"] .navbar,
+html.dark[data-cd-theme="on"] .navbar.navbar-default {
+	background-color: var(--cd-dark-navbar-bg) !important;
+	color: var(--cd-dark-navbar-text) !important;
+	border-bottom: 1px solid #1e293b;
+}
+html.dark[data-cd-theme="on"] .navbar a,
+html.dark[data-cd-theme="on"] .navbar .navbar-brand {
+	color: var(--cd-dark-navbar-text) !important;
 }
 
 /* Sidebar (covers older sidebar classes and v16's workspace sidebar
@@ -48,17 +120,45 @@ html[data-cd-theme="on"] .workspace-sidebar,
 html[data-cd-theme="on"] [class*="sidebar"] {
 	background-color: var(--cd-sidebar-bg);
 	color: var(--cd-sidebar-text);
+	border-right: 1px solid #e2e8f0;
 }
 html[data-cd-theme="on"] .desk-sidebar a,
 html[data-cd-theme="on"] .standard-sidebar a,
 html[data-cd-theme="on"] .workspace-sidebar a {
 	color: var(--cd-sidebar-text);
 }
+html.dark[data-cd-theme="on"] .desk-sidebar,
+html.dark[data-cd-theme="on"] .standard-sidebar,
+html.dark[data-cd-theme="on"] .workspace-sidebar,
+html.dark[data-cd-theme="on"] [class*="sidebar"] {
+	background-color: var(--cd-dark-sidebar-bg);
+	color: var(--cd-dark-sidebar-text);
+	border-right: 1px solid #1e293b;
+}
+html.dark[data-cd-theme="on"] .desk-sidebar a,
+html.dark[data-cd-theme="on"] .standard-sidebar a,
+html.dark[data-cd-theme="on"] .workspace-sidebar a {
+	color: var(--cd-dark-sidebar-text);
+}
+
+/* Selected/active sidebar item: a light tint behind it plus the accent
+   color as text (same pairing the frontend uses for its active nav state
+   and "primary" badges), not a solid fill - a solid brass/indigo block
+   with the sidebar's normal text color on top measures well under 3:1
+   contrast in either mode. */
 html[data-cd-theme="on"] .desk-sidebar .selected,
 html[data-cd-theme="on"] .standard-sidebar .selected,
 html[data-cd-theme="on"] .sidebar-item.selected,
 html[data-cd-theme="on"] [class*="sidebar"] .active {
-	background-color: var(--cd-sidebar-active) !important;
+	background-color: var(--cd-active-bg) !important;
+	color: var(--cd-accent) !important;
+}
+html.dark[data-cd-theme="on"] .desk-sidebar .selected,
+html.dark[data-cd-theme="on"] .standard-sidebar .selected,
+html.dark[data-cd-theme="on"] .sidebar-item.selected,
+html.dark[data-cd-theme="on"] [class*="sidebar"] .active {
+	background-color: var(--cd-dark-active-bg) !important;
+	color: var(--cd-dark-accent) !important;
 }
 
 /* Buttons & controls */
@@ -67,15 +167,36 @@ html[data-cd-theme="on"] .btn-primary {
 	border-color: var(--cd-primary) !important;
 	border-radius: var(--cd-radius) !important;
 }
+html.dark[data-cd-theme="on"] .btn-primary {
+	background-color: var(--cd-dark-primary) !important;
+	border-color: var(--cd-dark-primary) !important;
+}
 html[data-cd-theme="on"] .btn {
 	border-radius: var(--cd-radius) !important;
 }
 html[data-cd-theme="on"] a {
 	color: var(--cd-primary);
 }
+html.dark[data-cd-theme="on"] a {
+	color: var(--cd-dark-primary);
+}
+
+/* Indicator dots/pills that map to Frappe's "blue" status - repainted as
+   the same light-tint + accent-text pairing used for the sidebar's active
+   state and the frontend's "primary" badge variant. */
 html[data-cd-theme="on"] .indicator.blue,
 html[data-cd-theme="on"] .indicator-pill.blue {
-	background-color: var(--cd-accent);
+	background-color: var(--cd-active-bg);
+}
+html[data-cd-theme="on"] .indicator-pill.blue {
+	color: var(--cd-accent);
+}
+html.dark[data-cd-theme="on"] .indicator.blue,
+html.dark[data-cd-theme="on"] .indicator-pill.blue {
+	background-color: var(--cd-dark-active-bg);
+}
+html.dark[data-cd-theme="on"] .indicator-pill.blue {
+	color: var(--cd-dark-accent);
 }
 
 /* Cards, widgets, number cards, dashboards */
@@ -85,6 +206,14 @@ html[data-cd-theme="on"] .dashboard-card,
 html[data-cd-theme="on"] .number-card {
 	background-color: var(--cd-card-bg);
 	border-radius: var(--cd-radius);
+	border: 1px solid #e2e8f0;
+}
+html.dark[data-cd-theme="on"] .frappe-card,
+html.dark[data-cd-theme="on"] .widget,
+html.dark[data-cd-theme="on"] .dashboard-card,
+html.dark[data-cd-theme="on"] .number-card {
+	background-color: var(--cd-dark-card-bg);
+	border: 1px solid #1e293b;
 }
 
 /* Form controls follow the same corner-roundness choice for visual
@@ -92,19 +221,6 @@ html[data-cd-theme="on"] .number-card {
 html[data-cd-theme="on"] .form-control,
 html[data-cd-theme="on"] .input-with-feedback {
 	border-radius: var(--cd-radius);
-}
-
-/* Dark mode overrides - applied when Frappe's own `.dark` class is present
-   on <html>, whether the admin forced it via Color Scheme Mode or the user
-   picked it themselves via Frappe's native toggle. */
-html.dark[data-cd-theme="on"] body {
-	background-color: var(--cd-dark-bg);
-	color: var(--cd-dark-text);
-}
-html.dark[data-cd-theme="on"] .frappe-card,
-html.dark[data-cd-theme="on"] .widget,
-html.dark[data-cd-theme="on"] .number-card {
-	background-color: color-mix(in srgb, var(--cd-dark-bg) 85%, white 15%);
 }
 
 /* Success / danger semantic colors, applied where Frappe uses its own
@@ -116,4 +232,12 @@ html[data-cd-theme="on"] .indicator.green {
 html[data-cd-theme="on"] .text-danger,
 html[data-cd-theme="on"] .indicator.red {
 	color: var(--cd-danger) !important;
+}
+html.dark[data-cd-theme="on"] .text-success,
+html.dark[data-cd-theme="on"] .indicator.green {
+	color: var(--cd-dark-success) !important;
+}
+html.dark[data-cd-theme="on"] .text-danger,
+html.dark[data-cd-theme="on"] .indicator.red {
+	color: var(--cd-dark-danger) !important;
 }

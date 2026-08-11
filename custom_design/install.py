@@ -10,12 +10,15 @@ def after_install():
 	settings = frappe.get_single("Design Settings")
 
 	if not settings.chart_colors:
+		# Same 500-weight swatches the frontend uses for its primary/success/
+		# warning/danger/info scales (src/index.css) - keeps dashboard charts
+		# on the same palette as the rest of the product.
 		default_palette = [
-			("#16324F", "Ink"),
-			("#C68A2E", "Brass"),
-			("#3E7A5A", "Verified Green"),
-			("#6E93AC", "Ink Light"),
-			("#B84A3E", "Alert"),
+			("#6366F1", "Primary"),
+			("#10B981", "Success"),
+			("#F59E0B", "Warning"),
+			("#EF4444", "Danger"),
+			("#0EA5E9", "Info"),
 		]
 		for color, label in default_palette:
 			settings.append("chart_colors", {"color": color, "label": label})

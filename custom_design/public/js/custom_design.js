@@ -109,23 +109,29 @@
 		setVar(root, "--cd-danger", settings.danger_color);
 		setVar(root, "--cd-dark-bg", settings.dark_background_color);
 		setVar(root, "--cd-dark-text", settings.dark_text_color);
+		setVar(root, "--cd-dark-primary", settings.dark_primary_color);
+		setVar(root, "--cd-dark-accent", settings.dark_accent_color);
+		setVar(root, "--cd-dark-success", settings.dark_success_color);
+		setVar(root, "--cd-dark-danger", settings.dark_danger_color);
 		setVar(root, "--cd-sidebar-bg", settings.sidebar_background_color);
 		setVar(root, "--cd-sidebar-text", settings.sidebar_text_color);
 		setVar(root, "--cd-sidebar-active", settings.sidebar_active_color);
 		setVar(root, "--cd-navbar-bg", settings.navbar_background_color);
 		setVar(root, "--cd-navbar-text", settings.navbar_text_color);
+		setVar(root, "--cd-dark-sidebar-bg", settings.dark_sidebar_background_color);
+		setVar(root, "--cd-dark-sidebar-text", settings.dark_sidebar_text_color);
+		setVar(root, "--cd-dark-navbar-bg", settings.dark_navbar_background_color);
+		setVar(root, "--cd-dark-navbar-text", settings.dark_navbar_text_color);
 		setVar(root, "--cd-card-bg", settings.number_card_background);
+		setVar(root, "--cd-dark-card-bg", settings.dark_number_card_background);
 
-		// Best-effort remap of Frappe's own theme variables, where Frappe
-		// already threads CSS custom properties through native components.
-		// If a given Frappe release doesn't use one of these names, it's a
-		// harmless no-op - the --cd-* variables above and the explicit
-		// selectors in custom_design.css still carry the visual weight.
-		setVar(root, "--primary", settings.primary_color);
-		setVar(root, "--primary-color", settings.primary_color);
-		setVar(root, "--dt-primary-color", settings.primary_color);
-		setVar(root, "--bg-color", settings.background_color);
-		setVar(root, "--text-color", settings.text_color);
+		// Frappe's own theme variables (--primary, --bg-color, etc.) are
+		// remapped from the --cd-* values above, but that remap lives in
+		// custom_design.css, not here - it needs to swap between the light
+		// and dark field values whenever html.dark is toggled, and a CSS
+		// cascade rule reacts to that automatically while a one-time inline
+		// style set here would not (this function only re-runs on save/
+		// preview, not on every native dark-mode toggle).
 
 		if (settings.font_family && FONT_STACKS[settings.font_family]) {
 			setVar(root, "--cd-font", FONT_STACKS[settings.font_family]);

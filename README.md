@@ -5,9 +5,16 @@ settings screen controls colors, fonts, corner roundness, sidebar/navbar
 colors, dashboard chart colors, logo/favicon, and menu item overrides
 (rename, relink, or hide any sidebar/menu item by matching its text).
 
-Ships with defaults already matching the Tijarat frontend's brand palette
-(ink-blue, brass, parchment) so backend and frontend look consistent from
-the moment it's installed — no configuration required to get that baseline.
+Ships with defaults already matching the Tijarat frontend's actual design
+tokens (`dev/frontend/src/index.css`: indigo primary, slate neutrals,
+emerald/red/amber/sky semantic colors) so backend and frontend look
+consistent from the moment it's installed — no configuration required to
+get that baseline. Every color that would otherwise read as near-invisible
+against a dark background (a light-mode indigo sits at roughly 1:1
+contrast on a near-black page) has its own literal dark-mode default,
+mirroring the frontend's own separate light/dark shade choices rather than
+computing one from the other — see the "Core Colors (Dark Mode)" and
+"Sidebar & Navbar (Dark Mode)" sections on the Design Settings form.
 
 ## What Gets Installed Automatically
 

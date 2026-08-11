@@ -29,6 +29,12 @@
   "danger_color",
   "dark_background_color",
   "dark_text_color",
+  "sb_dark_interactive",
+  "dark_primary_color",
+  "dark_accent_color",
+  "cb_dark_interactive_1",
+  "dark_success_color",
+  "dark_danger_color",
   "sb_sidebar",
   "sidebar_background_color",
   "sidebar_text_color",
@@ -36,8 +42,15 @@
   "cb_sidebar_1",
   "navbar_background_color",
   "navbar_text_color",
+  "sb_dark_sidebar",
+  "dark_sidebar_background_color",
+  "dark_sidebar_text_color",
+  "cb_dark_sidebar_1",
+  "dark_navbar_background_color",
+  "dark_navbar_text_color",
   "sb_dashboard",
   "number_card_background",
+  "dark_number_card_background",
   "chart_colors",
   "sb_menu",
   "hide_help_menu",
@@ -129,7 +142,7 @@
    "options": "Default\nInter\nNoto Sans\nRoboto\nOpen Sans\nSystem UI"
   },
   {
-   "default": "Subtle (4px)",
+   "default": "Rounded (8px)",
    "fieldname": "border_radius",
    "fieldtype": "Select",
    "label": "Corner Roundness",
@@ -138,28 +151,30 @@
   {
    "fieldname": "sb_colors",
    "fieldtype": "Section Break",
-   "label": "Core Colors"
+   "label": "Core Colors (Light Mode)"
   },
   {
-   "default": "#16324F",
+   "default": "#4F46E5",
+   "description": "Buttons, links, primary actions. Matches the frontend's primary-600.",
    "fieldname": "primary_color",
    "fieldtype": "Color",
    "label": "Primary Color (buttons, links)"
   },
   {
-   "default": "#C68A2E",
+   "default": "#4338CA",
+   "description": "Text/icon color for highlighted or active items (e.g. selected sidebar entry). Matches the frontend's primary-700.",
    "fieldname": "accent_color",
    "fieldtype": "Color",
    "label": "Accent Color (highlights, active states)"
   },
   {
-   "default": "#F6F1E7",
+   "default": "#F8FAFC",
    "fieldname": "background_color",
    "fieldtype": "Color",
    "label": "Page Background"
   },
   {
-   "default": "#23201B",
+   "default": "#0F172A",
    "fieldname": "text_color",
    "fieldtype": "Color",
    "label": "Primary Text Color"
@@ -169,48 +184,86 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "#3E7A5A",
+   "default": "#047857",
    "fieldname": "success_color",
    "fieldtype": "Color",
    "label": "Success Color"
   },
   {
-   "default": "#B84A3E",
+   "default": "#B91C1C",
    "fieldname": "danger_color",
    "fieldtype": "Color",
    "label": "Danger / Alert Color"
   },
   {
-   "default": "#0D1E30",
+   "default": "#020617",
    "fieldname": "dark_background_color",
    "fieldtype": "Color",
    "label": "Dark Mode Background"
   },
   {
-   "default": "#F6F1E7",
+   "default": "#F1F5F9",
    "fieldname": "dark_text_color",
    "fieldtype": "Color",
    "label": "Dark Mode Text"
   },
   {
-   "fieldname": "sb_sidebar",
+   "collapsible": 1,
+   "description": "The colors above are tuned for a light background and read as near-invisible on a dark one (e.g. the primary color sits at ~1.3:1 contrast against the dark background - effectively invisible). These are the dark-mode equivalents, used automatically whenever the Desk is in dark mode - no separate toggle needed.",
+   "fieldname": "sb_dark_interactive",
    "fieldtype": "Section Break",
-   "label": "Sidebar & Navbar"
+   "label": "Core Colors (Dark Mode)"
   },
   {
-   "default": "#16324F",
+   "default": "#6366F1",
+   "description": "Matches the frontend's primary-500 (used for buttons/links in dark mode).",
+   "fieldname": "dark_primary_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Primary Color"
+  },
+  {
+   "default": "#A5B4FC",
+   "description": "Matches the frontend's primary-300 (used for highlighted/active text in dark mode).",
+   "fieldname": "dark_accent_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Accent Color"
+  },
+  {
+   "fieldname": "cb_dark_interactive_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "#10B981",
+   "fieldname": "dark_success_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Success Color"
+  },
+  {
+   "default": "#EF4444",
+   "fieldname": "dark_danger_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Danger Color"
+  },
+  {
+   "fieldname": "sb_sidebar",
+   "fieldtype": "Section Break",
+   "label": "Sidebar & Navbar (Light Mode)"
+  },
+  {
+   "default": "#FFFFFF",
    "fieldname": "sidebar_background_color",
    "fieldtype": "Color",
    "label": "Sidebar Background"
   },
   {
-   "default": "#F6F1E7",
+   "default": "#475569",
    "fieldname": "sidebar_text_color",
    "fieldtype": "Color",
    "label": "Sidebar Text"
   },
   {
-   "default": "#C68A2E",
+   "default": "#EEF2FF",
+   "description": "Background tint behind the selected/active item. Pair with Accent Color for the text on top of it.",
    "fieldname": "sidebar_active_color",
    "fieldtype": "Color",
    "label": "Sidebar Active / Selected Item"
@@ -220,16 +273,51 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "#16324F",
+   "default": "#FFFFFF",
    "fieldname": "navbar_background_color",
    "fieldtype": "Color",
    "label": "Top Navbar Background"
   },
   {
-   "default": "#F6F1E7",
+   "default": "#0F172A",
    "fieldname": "navbar_text_color",
    "fieldtype": "Color",
    "label": "Top Navbar Text"
+  },
+  {
+   "collapsible": 1,
+   "description": "A solid brand-colored sidebar/navbar reads fine in both modes on its own, but this app's frontend counterpart uses a neutral white/near-black surface instead (with brand color only as an accent) - these are its dark-mode equivalents, applied automatically in dark mode.",
+   "fieldname": "sb_dark_sidebar",
+   "fieldtype": "Section Break",
+   "label": "Sidebar & Navbar (Dark Mode)"
+  },
+  {
+   "default": "#0F172A",
+   "fieldname": "dark_sidebar_background_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Sidebar Background"
+  },
+  {
+   "default": "#CBD5E1",
+   "fieldname": "dark_sidebar_text_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Sidebar Text"
+  },
+  {
+   "fieldname": "cb_dark_sidebar_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "#0F172A",
+   "fieldname": "dark_navbar_background_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Navbar Background"
+  },
+  {
+   "default": "#F1F5F9",
+   "fieldname": "dark_navbar_text_color",
+   "fieldtype": "Color",
+   "label": "Dark Mode Navbar Text"
   },
   {
    "fieldname": "sb_dashboard",
@@ -237,10 +325,16 @@
    "label": "Dashboard & Charts"
   },
   {
-   "default": "#FBF3E4",
+   "default": "#FFFFFF",
    "fieldname": "number_card_background",
    "fieldtype": "Color",
    "label": "Number Card Background"
+  },
+  {
+   "default": "#0F172A",
+   "fieldname": "dark_number_card_background",
+   "fieldtype": "Color",
+   "label": "Number Card Background (Dark Mode)"
   },
   {
    "description": "Used cyclically for chart series colors across dashboards. Add as many as you like.",
@@ -319,7 +413,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-08-11 00:00:00.000000",
+ "modified": "2026-08-12 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Custom Design",
  "name": "Design Settings",

@@ -290,13 +290,14 @@
 
 		root.setAttribute("data-cd-theme", "on");
 
-		if (settings.color_scheme_mode === "Dark") {
-			enforceColorScheme("dark");
-		} else if (settings.color_scheme_mode === "Light") {
-			enforceColorScheme("light");
-		}
-		// "User Choice" modes intentionally leave Frappe's own light/dark
-		// toggle alone rather than forcing a mode.
+		// Theme Mode is always exactly one of "Light"/"Dark" now (the old
+		// "User Choice" options were removed - a single mode for the whole
+		// system, enforced through Frappe's own real API, is what keeps
+		// this app's colors and Frappe's own "Toggle Theme" menu item from
+		// ever disagreeing with each other). Default to light on anything
+		// unexpected (e.g. a site mid-migration still holding one of the
+		// retired "User Choice..." strings) rather than doing nothing.
+		enforceColorScheme(settings.color_scheme_mode === "Dark" ? "dark" : "light");
 
 		window.custom_design._appTitle = settings.app_title || null;
 		applyBrandText();

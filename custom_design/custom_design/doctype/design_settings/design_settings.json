@@ -18,39 +18,35 @@
   "disable_email_link_login",
   "login_footer_html",
   "login_footer_size",
-  "sb_theme",
+  "sb_theme_mode",
   "color_scheme_mode",
-  "cb_theme_1",
+  "cb_theme_mode_1",
   "font_family",
   "border_radius",
   "sb_colors",
   "primary_color",
-  "accent_color",
-  "background_color",
-  "text_color",
-  "cb_colors_1",
-  "success_color",
-  "danger_color",
-  "dark_background_color",
-  "dark_text_color",
-  "sb_dark_interactive",
   "dark_primary_color",
+  "accent_color",
   "dark_accent_color",
-  "cb_dark_interactive_1",
+  "success_color",
   "dark_success_color",
+  "danger_color",
   "dark_danger_color",
+  "cb_colors_1",
+  "background_color",
+  "dark_background_color",
+  "text_color",
+  "dark_text_color",
   "sb_sidebar",
   "sidebar_background_color",
+  "dark_sidebar_background_color",
   "sidebar_text_color",
+  "dark_sidebar_text_color",
   "sidebar_active_color",
   "cb_sidebar_1",
   "navbar_background_color",
-  "navbar_text_color",
-  "sb_dark_sidebar",
-  "dark_sidebar_background_color",
-  "dark_sidebar_text_color",
-  "cb_dark_sidebar_1",
   "dark_navbar_background_color",
+  "navbar_text_color",
   "dark_navbar_text_color",
   "sb_dashboard",
   "number_card_background",
@@ -152,19 +148,21 @@
    "options": "Compact (32px)\nNormal (48px)\nSpacious (64px)"
   },
   {
-   "fieldname": "sb_theme",
+   "fieldname": "sb_theme_mode",
    "fieldtype": "Section Break",
-   "label": "Theme & Colors"
+   "label": "Theme Mode"
   },
   {
-   "default": "User Choice (Light Default)",
+   "default": "Light",
+   "description": "Picks ONE mode for the whole system - every field below then only shows the colors that actually apply, so light and dark values never get mixed up. This is also what \"Toggle Theme\" in the user menu reflects: Design Settings drives it, not the other way around, so switching there and saving here always agree with each other.",
    "fieldname": "color_scheme_mode",
    "fieldtype": "Select",
-   "label": "Color Scheme Mode",
-   "options": "Light\nDark\nUser Choice (Light Default)\nUser Choice (Dark Default)"
+   "label": "Theme Mode",
+   "options": "Light\nDark",
+   "reqd": 1
   },
   {
-   "fieldname": "cb_theme_1",
+   "fieldname": "cb_theme_mode_1",
    "fieldtype": "Column Break"
   },
   {
@@ -184,119 +182,137 @@
   {
    "fieldname": "sb_colors",
    "fieldtype": "Section Break",
-   "label": "Core Colors (Light Mode)"
+   "label": "Core Colors"
   },
   {
    "default": "#4F46E5",
-   "description": "Buttons, links, primary actions. Matches the frontend's primary-600.",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
+   "description": "Buttons, links, primary actions.",
    "fieldname": "primary_color",
    "fieldtype": "Color",
    "label": "Primary Color (buttons, links)"
   },
   {
+   "default": "#6366F1",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
+   "description": "Buttons, links, primary actions.",
+   "fieldname": "dark_primary_color",
+   "fieldtype": "Color",
+   "label": "Primary Color (buttons, links)"
+  },
+  {
    "default": "#4338CA",
-   "description": "Text/icon color for highlighted or active items (e.g. selected sidebar entry). Matches the frontend's primary-700.",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
+   "description": "Text/icon color for highlighted or active items (e.g. selected sidebar entry).",
    "fieldname": "accent_color",
    "fieldtype": "Color",
    "label": "Accent Color (highlights, active states)"
   },
   {
-   "default": "#F8FAFC",
-   "fieldname": "background_color",
+   "default": "#A5B4FC",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
+   "description": "Text/icon color for highlighted or active items (e.g. selected sidebar entry).",
+   "fieldname": "dark_accent_color",
    "fieldtype": "Color",
-   "label": "Page Background"
+   "label": "Accent Color (highlights, active states)"
   },
   {
-   "default": "#0F172A",
-   "fieldname": "text_color",
+   "default": "#047857",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
+   "fieldname": "success_color",
    "fieldtype": "Color",
-   "label": "Primary Text Color"
+   "label": "Success Color"
+  },
+  {
+   "default": "#10B981",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
+   "fieldname": "dark_success_color",
+   "fieldtype": "Color",
+   "label": "Success Color"
+  },
+  {
+   "default": "#B91C1C",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
+   "fieldname": "danger_color",
+   "fieldtype": "Color",
+   "label": "Danger / Alert Color"
+  },
+  {
+   "default": "#EF4444",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
+   "fieldname": "dark_danger_color",
+   "fieldtype": "Color",
+   "label": "Danger / Alert Color"
   },
   {
    "fieldname": "cb_colors_1",
    "fieldtype": "Column Break"
   },
   {
-   "default": "#047857",
-   "fieldname": "success_color",
+   "default": "#F8FAFC",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
+   "fieldname": "background_color",
    "fieldtype": "Color",
-   "label": "Success Color"
-  },
-  {
-   "default": "#B91C1C",
-   "fieldname": "danger_color",
-   "fieldtype": "Color",
-   "label": "Danger / Alert Color"
+   "label": "Page Background"
   },
   {
    "default": "#020617",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
    "fieldname": "dark_background_color",
    "fieldtype": "Color",
-   "label": "Dark Mode Background"
+   "label": "Page Background"
+  },
+  {
+   "default": "#0F172A",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
+   "fieldname": "text_color",
+   "fieldtype": "Color",
+   "label": "Primary Text Color"
   },
   {
    "default": "#F1F5F9",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
    "fieldname": "dark_text_color",
    "fieldtype": "Color",
-   "label": "Dark Mode Text"
-  },
-  {
-   "collapsible": 1,
-   "description": "The colors above are tuned for a light background and read as near-invisible on a dark one (e.g. the primary color sits at ~1.3:1 contrast against the dark background - effectively invisible). These are the dark-mode equivalents, used automatically whenever the Desk is in dark mode - no separate toggle needed.",
-   "fieldname": "sb_dark_interactive",
-   "fieldtype": "Section Break",
-   "label": "Core Colors (Dark Mode)"
-  },
-  {
-   "default": "#6366F1",
-   "description": "Matches the frontend's primary-500 (used for buttons/links in dark mode).",
-   "fieldname": "dark_primary_color",
-   "fieldtype": "Color",
-   "label": "Dark Mode Primary Color"
-  },
-  {
-   "default": "#A5B4FC",
-   "description": "Matches the frontend's primary-300 (used for highlighted/active text in dark mode).",
-   "fieldname": "dark_accent_color",
-   "fieldtype": "Color",
-   "label": "Dark Mode Accent Color"
-  },
-  {
-   "fieldname": "cb_dark_interactive_1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "#10B981",
-   "fieldname": "dark_success_color",
-   "fieldtype": "Color",
-   "label": "Dark Mode Success Color"
-  },
-  {
-   "default": "#EF4444",
-   "fieldname": "dark_danger_color",
-   "fieldtype": "Color",
-   "label": "Dark Mode Danger Color"
+   "label": "Primary Text Color"
   },
   {
    "fieldname": "sb_sidebar",
    "fieldtype": "Section Break",
-   "label": "Sidebar & Navbar (Light Mode)"
+   "label": "Sidebar & Navbar"
   },
   {
    "default": "#FFFFFF",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
    "fieldname": "sidebar_background_color",
    "fieldtype": "Color",
    "label": "Sidebar Background"
   },
   {
+   "default": "#0F172A",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
+   "fieldname": "dark_sidebar_background_color",
+   "fieldtype": "Color",
+   "label": "Sidebar Background"
+  },
+  {
    "default": "#475569",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
    "fieldname": "sidebar_text_color",
    "fieldtype": "Color",
    "label": "Sidebar Text"
   },
   {
+   "default": "#CBD5E1",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
+   "fieldname": "dark_sidebar_text_color",
+   "fieldtype": "Color",
+   "label": "Sidebar Text"
+  },
+  {
    "default": "#EEF2FF",
-   "description": "Background tint behind the selected/active item. Pair with Accent Color for the text on top of it.",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
+   "description": "Background tint behind the selected/active item. Pair with Accent Color for the text on top of it. Dark mode has no separate field for this - it's auto-derived from Primary Color instead, since a literal color picked against a light background wouldn't carry over correctly.",
    "fieldname": "sidebar_active_color",
    "fieldtype": "Color",
    "label": "Sidebar Active / Selected Item"
@@ -307,50 +323,31 @@
   },
   {
    "default": "#FFFFFF",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
    "fieldname": "navbar_background_color",
    "fieldtype": "Color",
    "label": "Top Navbar Background"
   },
   {
    "default": "#0F172A",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
+   "fieldname": "dark_navbar_background_color",
+   "fieldtype": "Color",
+   "label": "Top Navbar Background"
+  },
+  {
+   "default": "#0F172A",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
    "fieldname": "navbar_text_color",
    "fieldtype": "Color",
    "label": "Top Navbar Text"
   },
   {
-   "collapsible": 1,
-   "description": "A solid brand-colored sidebar/navbar reads fine in both modes on its own, but this app's frontend counterpart uses a neutral white/near-black surface instead (with brand color only as an accent) - these are its dark-mode equivalents, applied automatically in dark mode.",
-   "fieldname": "sb_dark_sidebar",
-   "fieldtype": "Section Break",
-   "label": "Sidebar & Navbar (Dark Mode)"
-  },
-  {
-   "default": "#0F172A",
-   "fieldname": "dark_sidebar_background_color",
-   "fieldtype": "Color",
-   "label": "Dark Mode Sidebar Background"
-  },
-  {
-   "default": "#CBD5E1",
-   "fieldname": "dark_sidebar_text_color",
-   "fieldtype": "Color",
-   "label": "Dark Mode Sidebar Text"
-  },
-  {
-   "fieldname": "cb_dark_sidebar_1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "#0F172A",
-   "fieldname": "dark_navbar_background_color",
-   "fieldtype": "Color",
-   "label": "Dark Mode Navbar Background"
-  },
-  {
    "default": "#F1F5F9",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
    "fieldname": "dark_navbar_text_color",
    "fieldtype": "Color",
-   "label": "Dark Mode Navbar Text"
+   "label": "Top Navbar Text"
   },
   {
    "fieldname": "sb_dashboard",
@@ -359,18 +356,20 @@
   },
   {
    "default": "#FFFFFF",
+   "depends_on": "eval:doc.color_scheme_mode=='Light'",
    "fieldname": "number_card_background",
    "fieldtype": "Color",
    "label": "Number Card Background"
   },
   {
    "default": "#0F172A",
+   "depends_on": "eval:doc.color_scheme_mode=='Dark'",
    "fieldname": "dark_number_card_background",
    "fieldtype": "Color",
-   "label": "Number Card Background (Dark Mode)"
+   "label": "Number Card Background"
   },
   {
-   "description": "Used cyclically for chart series colors across dashboards. Add as many as you like.",
+   "description": "Used cyclically for chart series colors across dashboards, in both modes. Add as many as you like.",
    "fieldname": "chart_colors",
    "fieldtype": "Table",
    "label": "Chart Color Palette",
@@ -464,7 +463,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-08-12 00:00:00.000000",
+ "modified": "2026-08-13 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Custom Design",
  "name": "Design Settings",

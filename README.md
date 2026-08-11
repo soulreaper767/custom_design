@@ -18,32 +18,56 @@ computing one from the other — see the "Core Colors (Dark Mode)" and
 
 ## Already Installed This Before? Read This After Every `git pull`
 
-A doctype JSON change (new field, new default) only ever affects **brand
-new** installs automatically — Frappe never retroactively rewrites values
-already saved in an existing site's database just because a shipped
-default changed. Concretely: the light-mode palette moved from the
-original ink/brass/parchment colors to the frontend's actual indigo/slate
-tokens, but an already-installed site kept the *old* saved values in light
-mode (this is why dark mode looked right immediately — those fields were
-brand new and had nothing old to be stuck on — while light mode kept
-showing the old palette, with old and new fields mismatched against each
-other in things like badges and the sidebar's active-item highlight).
-
-**The fix is always the same, every time this happens again in the
-future:** after `git pull`, run
+**Every update needs both of these, every time — never just one:**
 
 ```bash
-bench --site tijarat.local migrate
+bench --site tijarat.local migrate       # DocType/data changes
+bench --site tijarat.local build --app custom_design   # CSS/JS changes
 bench --site tijarat.local clear-cache
 ```
 
-`bench migrate` both adds any new fields *and* runs this app's patches
+`git pull` only updates the source files inside `apps/custom_design/`. It
+does not touch the site's database (so a new DocType field or a patch
+never runs until `migrate` does), and it does not touch the copy of
+`custom_design.css`/`custom_design.js` actually served to the browser at
+`/assets/custom_design/...` (`bench build` is what copies `public/` into
+`sites/assets/`). Skipping either step means the browser keeps loading
+old CSS/JS or the database keeps old data even though the repo is
+up to date - **this is the single most common source of "I pulled the
+fix and nothing changed."**
+
+### Postmortem: why dark mode broke even though only colors should have changed
+
+Frappe marks dark mode with a `data-theme="dark"` **attribute** on
+`<html>` (set by `frappe.ui.set_theme()` - confirmed against
+`frappe/frappe`'s own `theme_switcher.js`), not a `dark` CSS **class**.
+An earlier version of this app's CSS/JS assumed the class. Every
+dark-mode-specific rule was silently dead — never matching anything —
+which is *also* why dark mode looked fine at first: nothing here was
+overriding it, so Frappe's own native dark theme (plus this file's
+light-mode rules, which weren't scoped to exclude dark mode) painted
+through untouched. Once a later patch corrected the light-mode sidebar
+color from the original dark navy to white, that white started forcing
+itself into real dark-mode sessions too, since the light-mode rule fires
+whenever this app is enabled, full stop - the intended dark-mode override
+never engaged to stop it. Fixed by switching every dark-mode selector to
+`[data-theme="dark"]`; also corrected icon coloring (Frappe icons pick up
+`color` via inheritance - forcing `fill` directly, which an earlier
+version did, is ineffective at best and can add an unwanted solid fill
+to outline-style icons at worst) and added real, verified Frappe class
+names (`.body-sidebar`, `.es-icon`, etc.) alongside the defensive
+guesses, cross-checked against Frappe's own source and a working
+third-party Frappe theming app rather than assumed.
+
+A doctype JSON change (new field, new default) only ever affects **brand
+new** installs automatically — Frappe never retroactively rewrites values
+already saved in an existing site's database just because a shipped
+default changed. `bench migrate` runs this app's patches
 (`custom_design/patches.txt`), which backfill already-installed sites to
 match what a fresh install would get — stale color values reset to the
 current defaults (only if they're still exactly the old shipped default,
 never if you've customized them), new dark-mode fields filled in, brand
-text synced, and the starter sidebar override seeded. `git pull` alone is
-never enough for this app - it's a Frappe app, not a static asset bundle.
+text synced, and the starter sidebar override seeded.
 
 ## What Gets Installed Automatically
 
@@ -161,13 +185,16 @@ update and running `bench migrate` runs the same sync via a patch (see
   past those isn't recolored rather than reusing a hue or guessing a 9th
   one, since that would undermine the whole point of a validated set.
   Targeted by each module's public route (`/app/selling`, etc.) rather
-  than sidebar DOM/class names, since those are far more likely to change
-  between Frappe versions (see the sidebar caveat below). Sets color on
-  the link AND fill on any nested `svg`/`use`/`path`, both `!important`,
-  since Frappe's icon component doesn't always rely on plain `currentColor`
-  inheritance — if a given site's icons still don't pick up color after
-  that, it's a harmless no-op, not a broken layout, and the module's text
-  label is unaffected either way.
+  than sidebar DOM/class names, since routes are far more stable across
+  Frappe versions. Sets `color` (verified mechanism — Frappe icons pick up
+  inherited `color` via `currentColor`, either as an SVG fill/stroke or as
+  the tint behind a `mask-image` on the newer icon system; there's no
+  `fill` to force) on the link and on the verified icon-bearing
+  descendants (`.icon`, `.es-icon`, `svg`, `.sidebar-item-icon`),
+  `!important` since Frappe's own icon styling is reasonably specific —
+  if a given site's icons still don't pick up color, it's a harmless
+  no-op, not a broken layout, and the module's text label is unaffected
+  either way.
 
 ### Advanced / Escape Hatch
 

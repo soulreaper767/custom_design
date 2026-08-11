@@ -49,6 +49,23 @@
 		});
 	}
 
+	// Frappe marks dark mode with a data-theme="dark"/"light" attribute on
+	// <html> (set via frappe.ui.set_theme(), which also persists the choice
+	// server-side) - not a "dark" CSS class. custom_design.css's dark-mode
+	// rules key off that same attribute, so this needs to set it the real
+	// way, not invent a class Frappe doesn't read. Skips the call if the
+	// attribute already matches, so a "Forced Dark/Light" site doesn't fire
+	// a server round-trip on every single page load once it's already set.
+	function enforceColorScheme(mode) {
+		const root = document.documentElement;
+		if (root.getAttribute("data-theme") === mode) return;
+		if (window.frappe && frappe.ui && typeof frappe.ui.set_theme === "function") {
+			frappe.ui.set_theme(mode);
+		} else {
+			root.setAttribute("data-theme", mode);
+		}
+	}
+
 	function replaceBrandWords(text, title) {
 		return text.replace(/\bFrappe\b|\bERPNext\b/g, title);
 	}
@@ -199,10 +216,11 @@
 		// Frappe's own theme variables (--primary, --bg-color, etc.) are
 		// remapped from the --cd-* values above, but that remap lives in
 		// custom_design.css, not here - it needs to swap between the light
-		// and dark field values whenever html.dark is toggled, and a CSS
-		// cascade rule reacts to that automatically while a one-time inline
-		// style set here would not (this function only re-runs on save/
-		// preview, not on every native dark-mode toggle).
+		// and dark field values whenever html's data-theme attribute
+		// changes, and a CSS cascade rule reacts to that automatically
+		// while a one-time inline style set here would not (this function
+		// only re-runs on save/preview, not on every native dark-mode
+		// toggle).
 
 		if (settings.font_family && FONT_STACKS[settings.font_family]) {
 			setVar(root, "--cd-font", FONT_STACKS[settings.font_family]);
@@ -214,9 +232,9 @@
 		root.setAttribute("data-cd-theme", "on");
 
 		if (settings.color_scheme_mode === "Dark") {
-			root.classList.add("dark");
+			enforceColorScheme("dark");
 		} else if (settings.color_scheme_mode === "Light") {
-			root.classList.remove("dark");
+			enforceColorScheme("light");
 		}
 		// "User Choice" modes intentionally leave Frappe's own light/dark
 		// toggle alone rather than forcing a mode.

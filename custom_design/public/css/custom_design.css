@@ -3,17 +3,31 @@
    Fallback values baked into each var() call match Design Settings' own
    JSON defaults, so styling is correct even before JS finishes running.
 
-   Dark mode: every interactive/semantic color (primary, accent, success,
-   danger, sidebar/navbar surfaces, card surfaces) has its own literal
-   dark-mode field in Design Settings, mirroring the frontend's own
-   per-mode token choices (src/index.css + components/ui) rather than
-   trying to auto-derive one from the light value - a color tuned for the
-   light parchment/white background usually reads as near-invisible on a
-   dark one (e.g. a raw indigo-600 sits at ~1:1 contrast against a
-   near-black background). Every rule below that needs to differ by mode
-   is written as two rules (base + html.dark override) rather than one
-   rule referencing a variable that silently swaps underneath it, so the
-   light/dark pairing at each call site stays easy to audit. */
+   Dark mode detection: Frappe marks dark mode with a data-theme="dark"
+   attribute on <html> (set by frappe.ui.set_theme(), confirmed against
+   frappe/frappe's theme_switcher.js) - NOT a "dark" CSS class. An earlier
+   version of this file used html.dark, which never matched anything on a
+   real site, so every dark-mode override below was silently dead: what
+   looked like "dark mode working" was actually the light-mode rules
+   (which don't exclude dark mode) firing unconditionally in both modes,
+   papered over by Frappe's own native dark theme wherever this file
+   didn't force something more specific. Every rule that needs to differ
+   by mode is still written as two rules (base + [data-theme="dark"]
+   override, in that order) rather than one rule referencing a variable
+   that silently swaps underneath it, so the light/dark pairing at each
+   call site stays easy to audit - just with the correct selector this
+   time.
+
+   Icon coloring: verified against a working reference implementation
+   (frappe-theme by devlpr-nitish) and Frappe's own icon docs (ui.frappe.
+   io/docs/other/icons) - icons pick up color via inherited `color`
+   (either currentColor fill/stroke on an SVG, or a mask-image tinted by
+   background-color: currentColor for the newer icon system). There is no
+   "fill" override needed or safe to force generally - an earlier version
+   of this file forced `fill: X !important` on every nested svg/use/path,
+   which does nothing for mask-based icons and risks adding an unwanted
+   solid fill to stroke-only ones. Setting `color` on the right ancestor
+   is the whole mechanism. */
 
 :root {
 	--cd-primary: #4f46e5;
@@ -52,13 +66,19 @@
 	--cd-active-bg: var(--cd-sidebar-active);
 	--cd-dark-active-bg: color-mix(in srgb, var(--cd-dark-primary) 15%, var(--cd-dark-sidebar-bg) 85%);
 
+	/* Neutral hover wash for sidebar items and navbar icon buttons -
+	   matches the frontend's own hover-bg tokens (neutral-100 light /
+	   neutral-800 dark) exactly, see Sidebar.jsx / Topbar.jsx. */
+	--cd-hover-bg: #f1f5f9;
+	--cd-dark-hover-bg: #1e293b;
+
 	--cd-radius: 8px;
 	--cd-font: "Inter", sans-serif;
 }
 
 /* Frappe's own theme variables, remapped from the --cd-* values above so
    native components pick up the brand colors too. Scoped per mode (rather
-   than set once via JS) so it reacts immediately when html.dark toggles,
+   than set once via JS) so it reacts immediately when data-theme changes,
    including via Frappe's own native light/dark switch which this app
    doesn't control. If a given Frappe release doesn't consume one of these
    names, it's a harmless no-op - the explicit selectors below still carry
@@ -70,7 +90,7 @@ html[data-cd-theme="on"] {
 	--primary-color: var(--cd-primary);
 	--dt-primary-color: var(--cd-primary);
 }
-html.dark[data-cd-theme="on"] {
+html[data-theme="dark"][data-cd-theme="on"] {
 	--bg-color: var(--cd-dark-bg);
 	--text-color: var(--cd-dark-text);
 	--primary: var(--cd-dark-primary);
@@ -83,7 +103,7 @@ html[data-cd-theme="on"] body {
 	color: var(--cd-text);
 	font-family: var(--cd-font);
 }
-html.dark[data-cd-theme="on"] body {
+html[data-theme="dark"][data-cd-theme="on"] body {
 	background-color: var(--cd-dark-bg);
 	color: var(--cd-dark-text);
 }
@@ -100,20 +120,34 @@ html[data-cd-theme="on"] .navbar a,
 html[data-cd-theme="on"] .navbar .navbar-brand {
 	color: var(--cd-navbar-text) !important;
 }
-html.dark[data-cd-theme="on"] .navbar,
-html.dark[data-cd-theme="on"] .navbar.navbar-default {
+html[data-cd-theme="on"] .navbar button:hover,
+html[data-cd-theme="on"] .navbar .icon-btn:hover,
+html[data-cd-theme="on"] .navbar .btn:hover {
+	background-color: var(--cd-hover-bg);
+}
+html[data-theme="dark"][data-cd-theme="on"] .navbar,
+html[data-theme="dark"][data-cd-theme="on"] .navbar.navbar-default {
 	background-color: var(--cd-dark-navbar-bg) !important;
 	color: var(--cd-dark-navbar-text) !important;
 	border-bottom: 1px solid #1e293b;
 }
-html.dark[data-cd-theme="on"] .navbar a,
-html.dark[data-cd-theme="on"] .navbar .navbar-brand {
+html[data-theme="dark"][data-cd-theme="on"] .navbar a,
+html[data-theme="dark"][data-cd-theme="on"] .navbar .navbar-brand {
 	color: var(--cd-dark-navbar-text) !important;
 }
+html[data-theme="dark"][data-cd-theme="on"] .navbar button:hover,
+html[data-theme="dark"][data-cd-theme="on"] .navbar .icon-btn:hover,
+html[data-theme="dark"][data-cd-theme="on"] .navbar .btn:hover {
+	background-color: var(--cd-dark-hover-bg);
+}
 
-/* Sidebar (covers older sidebar classes and v16's workspace sidebar
-   container - both are targeted so the rule applies regardless of which
-   markup is actually present). */
+/* Sidebar. .body-sidebar/.standard-sidebar-item/.sidebar-header are
+   verified real Frappe class names (cross-checked against a working
+   third-party Frappe theming app); .desk-sidebar/.standard-sidebar/
+   .workspace-sidebar/[class*="sidebar"] are kept alongside as a
+   defensive net covering older versions or markup this wasn't verified
+   against - harmless if they simply don't match anything. */
+html[data-cd-theme="on"] .body-sidebar,
 html[data-cd-theme="on"] .desk-sidebar,
 html[data-cd-theme="on"] .standard-sidebar,
 html[data-cd-theme="on"] .workspace-sidebar,
@@ -122,23 +156,34 @@ html[data-cd-theme="on"] [class*="sidebar"] {
 	color: var(--cd-sidebar-text);
 	border-right: 1px solid #e2e8f0;
 }
+html[data-cd-theme="on"] .body-sidebar a,
 html[data-cd-theme="on"] .desk-sidebar a,
 html[data-cd-theme="on"] .standard-sidebar a,
 html[data-cd-theme="on"] .workspace-sidebar a {
 	color: var(--cd-sidebar-text);
 }
-html.dark[data-cd-theme="on"] .desk-sidebar,
-html.dark[data-cd-theme="on"] .standard-sidebar,
-html.dark[data-cd-theme="on"] .workspace-sidebar,
-html.dark[data-cd-theme="on"] [class*="sidebar"] {
+html[data-cd-theme="on"] .body-sidebar a:hover:not(.selected):not(.active),
+html[data-cd-theme="on"] [class*="sidebar"] a:hover:not(.selected):not(.active) {
+	background-color: var(--cd-hover-bg);
+}
+html[data-theme="dark"][data-cd-theme="on"] .body-sidebar,
+html[data-theme="dark"][data-cd-theme="on"] .desk-sidebar,
+html[data-theme="dark"][data-cd-theme="on"] .standard-sidebar,
+html[data-theme="dark"][data-cd-theme="on"] .workspace-sidebar,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] {
 	background-color: var(--cd-dark-sidebar-bg);
 	color: var(--cd-dark-sidebar-text);
 	border-right: 1px solid #1e293b;
 }
-html.dark[data-cd-theme="on"] .desk-sidebar a,
-html.dark[data-cd-theme="on"] .standard-sidebar a,
-html.dark[data-cd-theme="on"] .workspace-sidebar a {
+html[data-theme="dark"][data-cd-theme="on"] .body-sidebar a,
+html[data-theme="dark"][data-cd-theme="on"] .desk-sidebar a,
+html[data-theme="dark"][data-cd-theme="on"] .standard-sidebar a,
+html[data-theme="dark"][data-cd-theme="on"] .workspace-sidebar a {
 	color: var(--cd-dark-sidebar-text);
+}
+html[data-theme="dark"][data-cd-theme="on"] .body-sidebar a:hover:not(.selected):not(.active),
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a:hover:not(.selected):not(.active) {
+	background-color: var(--cd-dark-hover-bg);
 }
 
 /* Selected/active sidebar item: a light tint behind it plus the accent
@@ -146,6 +191,7 @@ html.dark[data-cd-theme="on"] .workspace-sidebar a {
    and "primary" badges), not a solid fill - a solid brass/indigo block
    with the sidebar's normal text color on top measures well under 3:1
    contrast in either mode. */
+html[data-cd-theme="on"] .body-sidebar .selected,
 html[data-cd-theme="on"] .desk-sidebar .selected,
 html[data-cd-theme="on"] .standard-sidebar .selected,
 html[data-cd-theme="on"] .sidebar-item.selected,
@@ -153,23 +199,40 @@ html[data-cd-theme="on"] [class*="sidebar"] .active {
 	background-color: var(--cd-active-bg) !important;
 	color: var(--cd-accent) !important;
 }
-html.dark[data-cd-theme="on"] .desk-sidebar .selected,
-html.dark[data-cd-theme="on"] .standard-sidebar .selected,
-html.dark[data-cd-theme="on"] .sidebar-item.selected,
-html.dark[data-cd-theme="on"] [class*="sidebar"] .active {
+html[data-theme="dark"][data-cd-theme="on"] .body-sidebar .selected,
+html[data-theme="dark"][data-cd-theme="on"] .desk-sidebar .selected,
+html[data-theme="dark"][data-cd-theme="on"] .standard-sidebar .selected,
+html[data-theme="dark"][data-cd-theme="on"] .sidebar-item.selected,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] .active {
 	background-color: var(--cd-dark-active-bg) !important;
 	color: var(--cd-dark-accent) !important;
 }
 
-/* Buttons & controls */
+/* Buttons & controls. Hover/active shades are the frontend's own verified
+   primary-700/800 (light) and primary-400 (dark) steps from Button.jsx,
+   not derived - static !important base colors otherwise flatten the
+   native hover/active affordance entirely. */
 html[data-cd-theme="on"] .btn-primary {
 	background-color: var(--cd-primary) !important;
 	border-color: var(--cd-primary) !important;
 	border-radius: var(--cd-radius) !important;
 }
-html.dark[data-cd-theme="on"] .btn-primary {
+html[data-cd-theme="on"] .btn-primary:hover {
+	background-color: #4338ca !important;
+	border-color: #4338ca !important;
+}
+html[data-cd-theme="on"] .btn-primary:active {
+	background-color: #3730a3 !important;
+	border-color: #3730a3 !important;
+}
+html[data-theme="dark"][data-cd-theme="on"] .btn-primary {
 	background-color: var(--cd-dark-primary) !important;
 	border-color: var(--cd-dark-primary) !important;
+}
+html[data-theme="dark"][data-cd-theme="on"] .btn-primary:hover,
+html[data-theme="dark"][data-cd-theme="on"] .btn-primary:active {
+	background-color: #818cf8 !important;
+	border-color: #818cf8 !important;
 }
 html[data-cd-theme="on"] .btn {
 	border-radius: var(--cd-radius) !important;
@@ -177,7 +240,7 @@ html[data-cd-theme="on"] .btn {
 html[data-cd-theme="on"] a {
 	color: var(--cd-primary);
 }
-html.dark[data-cd-theme="on"] a {
+html[data-theme="dark"][data-cd-theme="on"] a {
 	color: var(--cd-dark-primary);
 }
 
@@ -191,11 +254,11 @@ html[data-cd-theme="on"] .indicator-pill.blue {
 html[data-cd-theme="on"] .indicator-pill.blue {
 	color: var(--cd-accent) !important;
 }
-html.dark[data-cd-theme="on"] .indicator.blue,
-html.dark[data-cd-theme="on"] .indicator-pill.blue {
+html[data-theme="dark"][data-cd-theme="on"] .indicator.blue,
+html[data-theme="dark"][data-cd-theme="on"] .indicator-pill.blue {
 	background-color: var(--cd-dark-active-bg) !important;
 }
-html.dark[data-cd-theme="on"] .indicator-pill.blue {
+html[data-theme="dark"][data-cd-theme="on"] .indicator-pill.blue {
 	color: var(--cd-dark-accent) !important;
 }
 
@@ -208,10 +271,10 @@ html[data-cd-theme="on"] .number-card {
 	border-radius: var(--cd-radius);
 	border: 1px solid #e2e8f0;
 }
-html.dark[data-cd-theme="on"] .frappe-card,
-html.dark[data-cd-theme="on"] .widget,
-html.dark[data-cd-theme="on"] .dashboard-card,
-html.dark[data-cd-theme="on"] .number-card {
+html[data-theme="dark"][data-cd-theme="on"] .frappe-card,
+html[data-theme="dark"][data-cd-theme="on"] .widget,
+html[data-theme="dark"][data-cd-theme="on"] .dashboard-card,
+html[data-theme="dark"][data-cd-theme="on"] .number-card {
 	background-color: var(--cd-dark-card-bg);
 	border: 1px solid #1e293b;
 }
@@ -233,12 +296,12 @@ html[data-cd-theme="on"] .text-danger,
 html[data-cd-theme="on"] .indicator.red {
 	color: var(--cd-danger) !important;
 }
-html.dark[data-cd-theme="on"] .text-success,
-html.dark[data-cd-theme="on"] .indicator.green {
+html[data-theme="dark"][data-cd-theme="on"] .text-success,
+html[data-theme="dark"][data-cd-theme="on"] .indicator.green {
 	color: var(--cd-dark-success) !important;
 }
-html.dark[data-cd-theme="on"] .text-danger,
-html.dark[data-cd-theme="on"] .indicator.red {
+html[data-theme="dark"][data-cd-theme="on"] .text-danger,
+html[data-theme="dark"][data-cd-theme="on"] .indicator.red {
 	color: var(--cd-dark-danger) !important;
 }
 
@@ -248,79 +311,93 @@ html.dark[data-cd-theme="on"] .indicator.red {
    surfaces rather than assumed. Targeted by each module's public route
    (/app/selling, etc.) rather than by internal sidebar markup/class names,
    since routes are a stable, version-independent contract while v16's
-   sidebar internals are new (see the README's sidebar caveat) - so this
-   degrades gracefully (no color, not a broken layout) if a given site's
-   sidebar DOM doesn't expose the icon as a currentColor SVG the way Desk
-   normally does. Deliberately capped at 8: a 9th color would either
-   reuse a hue (misleading) or fall outside the validated set, so any
-   module past these 8 is left uncolored rather than guessing a 9th hue -
-   the same "fold into Other" rule the palette validator itself applies. */
-/* !important + explicit svg/use/path targeting, not just `color` on the
-   link: Frappe's icon component sometimes sets fill on the <svg>/<use>
-   itself rather than purely inheriting currentColor from an ancestor, so
-   a plain (non-important) `color` on the <a> can lose to that. Setting
-   both color AND fill, !important, covers either mechanism. */
+   sidebar internals are new. Sets `color` only (see file header for why -
+   the mask/currentColor mechanism reads inherited color, forcing `fill`
+   is both ineffective and, on stroke-based icons, actively wrong) on the
+   link and on the verified icon-bearing descendants
+   (.icon/.es-icon/svg/.sidebar-item-icon), !important since Frappe's own
+   icon styling is reasonably specific. Deliberately capped at 8: a 9th
+   color would either reuse a hue (misleading) or fall outside the
+   validated set, so any module past these 8 is left uncolored rather than
+   guessing a 9th hue - the same "fold into Other" rule the palette
+   validator itself applies. */
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] .icon,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] .es-icon,
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] svg,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] use,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] path { color: #2a78d6 !important; fill: #2a78d6 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] .sidebar-item-icon { color: #2a78d6 !important; }
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] .icon,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] .es-icon,
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] svg,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] use,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] path { color: #eb6834 !important; fill: #eb6834 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] .sidebar-item-icon { color: #eb6834 !important; }
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] .icon,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] .es-icon,
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] svg,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] use,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] path { color: #1baf7a !important; fill: #1baf7a !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] .sidebar-item-icon { color: #1baf7a !important; }
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] .icon,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] .es-icon,
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] svg,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] use,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] path { color: #eda100 !important; fill: #eda100 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] .sidebar-item-icon { color: #eda100 !important; }
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] .icon,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] .es-icon,
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] svg,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] use,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] path { color: #e87ba4 !important; fill: #e87ba4 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] .sidebar-item-icon { color: #e87ba4 !important; }
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] .icon,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] .es-icon,
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] svg,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] use,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] path { color: #008300 !important; fill: #008300 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] .sidebar-item-icon { color: #008300 !important; }
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] .icon,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] .es-icon,
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] svg,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] use,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] path { color: #4a3aa7 !important; fill: #4a3aa7 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] .sidebar-item-icon { color: #4a3aa7 !important; }
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] .icon,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] .es-icon,
 html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] svg,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] use,
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] path { color: #e34948 !important; fill: #e34948 !important; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"],
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] svg,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] use,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] path { color: #3987e5 !important; fill: #3987e5 !important; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"],
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] svg,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] use,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] path { color: #d95926 !important; fill: #d95926 !important; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"],
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] svg,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] use,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] path { color: #199e70 !important; fill: #199e70 !important; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"],
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] svg,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] use,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] path { color: #c98500 !important; fill: #c98500 !important; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"],
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] svg,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] use,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] path { color: #d55181 !important; fill: #d55181 !important; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"],
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] svg,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] use,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] path { color: #008300 !important; fill: #008300 !important; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"],
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] svg,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] use,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] path { color: #9085e9 !important; fill: #9085e9 !important; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"],
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] svg,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] use,
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] path { color: #e66767 !important; fill: #e66767 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] .sidebar-item-icon { color: #e34948 !important; }
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"],
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] .icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] .es-icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] svg,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] .sidebar-item-icon { color: #3987e5 !important; }
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"],
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] .icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] .es-icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] svg,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] .sidebar-item-icon { color: #d95926 !important; }
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"],
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] .icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] .es-icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] svg,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] .sidebar-item-icon { color: #199e70 !important; }
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"],
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] .icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] .es-icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] svg,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] .sidebar-item-icon { color: #c98500 !important; }
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"],
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] .icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] .es-icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] svg,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] .sidebar-item-icon { color: #d55181 !important; }
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"],
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] .icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] .es-icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] svg,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] .sidebar-item-icon { color: #008300 !important; }
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"],
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] .icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] .es-icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] svg,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] .sidebar-item-icon { color: #9085e9 !important; }
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"],
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] .icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] .es-icon,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] svg,
+html[data-theme="dark"][data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] .sidebar-item-icon { color: #e66767 !important; }

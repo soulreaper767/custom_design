@@ -1,12 +1,24 @@
 import frappe
 
-# Best-effort: the exact literal strings Frappe/ERPNext use for their own
-# branding vary a little by version, and not all of them are routed
-# through the same __() call Frappe's Translation records can target (see
-# _sync_email_footer below for the one significant exception - outgoing
-# email footers). This list covers the common, stable ones; anything a
-# specific site's version phrases differently can be added the normal
-# way, via Desk > Translation, without touching this app at all.
+# The exact literal strings Frappe/ERPNext use for their own branding vary
+# a little by version, and not all of them are routed through the same
+# __() call Frappe's Translation records can target (see _sync_email_footer
+# below for the one significant exception - outgoing email footers). This
+# list is a mix of the stable ("Frappe", "ERPNext" alone) and a handful
+# verified directly against frappe/frappe's source (the About dialog,
+# frappe/public/js/frappe/ui/theme_switcher.js's sibling
+# ui/toolbar/about.js) rather than guessed - "Open Source applications for
+# the web." and "Frappe Framework Version" are both quoted verbatim from
+# there. Anything a specific site's version phrases differently can be
+# added the normal way, via Desk > Translation, without touching this app
+# at all.
+#
+# Deliberately NOT included: the About dialog's copyright line ("Frappe
+# Technologies Pvt. Ltd. and contributors"). That's a legal attribution
+# naming who actually holds copyright on the underlying framework code,
+# not a cosmetic brand string - rebranding it would misrepresent
+# authorship, which is a different thing entirely from repainting "Powered
+# by" chrome. Leave it alone even if extending this list later.
 BRAND_REPLACEMENTS = {
 	"Frappe": "{title}",
 	"ERPNext": "{title}",
@@ -16,12 +28,11 @@ BRAND_REPLACEMENTS = {
 	"Frappe School": "{title} School",
 	"Frappe Forum": "{title} Forum",
 	"Frappe Support": "{title} Support",
+	"Frappe Framework Version": "{title} Version",
 	"About Frappe": "About {title}",
 	"Powered by Frappe": "Powered by {title}",
 	"Built on Frappe Framework": "Built on {title}",
-	"Open Source Applications for the Enterprise": "{title}",
-	"100% Open Source": "{title}",
-	"The world's #1 open source ERP": "{title}",
+	"Open Source applications for the web.": "{title}",
 }
 
 

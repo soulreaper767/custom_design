@@ -1,14 +1,14 @@
 import frappe
 
-from custom_design.branding import sync_brand_translations
+from custom_design.branding import seed_default_sidebar_override, sync_brand_translations
 
 
 def after_install():
 	"""Runs once, right after the app is installed on a site. Design
 	Settings' own field defaults already carry the brand colors (matching
-	the frontend), so the only thing left to seed programmatically is the
-	chart color palette, since Table field rows can't carry JSON defaults
-	the way simple fields can."""
+	the frontend), so the rest of this just seeds the two things that
+	can't carry JSON defaults the way simple fields can: the chart color
+	palette (a Table field) and one starter sidebar link override."""
 	settings = frappe.get_single("Design Settings")
 
 	if not settings.chart_colors:
@@ -24,6 +24,8 @@ def after_install():
 		]
 		for color, label in default_palette:
 			settings.append("chart_colors", {"color": color, "label": label})
+
+	seed_default_sidebar_override(settings)
 
 	settings.enabled = 1
 	settings.save(ignore_permissions=True)

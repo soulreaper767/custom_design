@@ -16,6 +16,35 @@ mirroring the frontend's own separate light/dark shade choices rather than
 computing one from the other — see the "Core Colors (Dark Mode)" and
 "Sidebar & Navbar (Dark Mode)" sections on the Design Settings form.
 
+## Already Installed This Before? Read This After Every `git pull`
+
+A doctype JSON change (new field, new default) only ever affects **brand
+new** installs automatically — Frappe never retroactively rewrites values
+already saved in an existing site's database just because a shipped
+default changed. Concretely: the light-mode palette moved from the
+original ink/brass/parchment colors to the frontend's actual indigo/slate
+tokens, but an already-installed site kept the *old* saved values in light
+mode (this is why dark mode looked right immediately — those fields were
+brand new and had nothing old to be stuck on — while light mode kept
+showing the old palette, with old and new fields mismatched against each
+other in things like badges and the sidebar's active-item highlight).
+
+**The fix is always the same, every time this happens again in the
+future:** after `git pull`, run
+
+```bash
+bench --site tijarat.local migrate
+bench --site tijarat.local clear-cache
+```
+
+`bench migrate` both adds any new fields *and* runs this app's patches
+(`custom_design/patches.txt`), which backfill already-installed sites to
+match what a fresh install would get — stale color values reset to the
+current defaults (only if they're still exactly the old shipped default,
+never if you've customized them), new dark-mode fields filled in, brand
+text synced, and the starter sidebar override seeded. `git pull` alone is
+never enough for this app - it's a Frappe app, not a static asset bundle.
+
 ## What Gets Installed Automatically
 
 Nothing manual is needed after `bench install-app` — this is intentional:
@@ -73,6 +102,13 @@ Check `Hide This Item Instead` to hide it entirely rather than relabel it.
 sidebar/app switcher): use the **Hidden Modules** table instead — pick the
 module by name, not by matching visible text.
 
+A starter row is seeded automatically (once, only if the table is still
+empty, so it's edit/delete-able like any override you'd add yourself):
+renames "Frappe HR" to "*Application Name* Teams" if a site has the HRMS
+app installed and that label is visible somewhere the override matcher
+can reach. Doesn't do anything if HRMS isn't installed. Edit or delete it
+like any other row - it's just data, not a rule this app enforces.
+
 ### Frappe/ERPNext Branding Text
 
 Setting **Application Name** replaces the words "Frappe" and "ERPNext"
@@ -92,12 +128,14 @@ Design**:
   so outgoing emails stop appending Frappe's own footer, replaced with
   one naming your app instead (only touched if you haven't already set a
   custom email footer yourself).
-- **Client-side (safety net):** a narrowly-scoped DOM pass for the
-  handful of chrome elements that aren't routed through `__()`, like the
-  "Powered by Frappe" footer link specifically. Scoped to known
-  branding/footer elements only — it never touches document data, so a
-  customer name or note that happens to contain the word "ERPNext" is
-  never rewritten.
+- **Client-side (safety net):** a DOM pass for chrome that isn't routed
+  through `__()` — the "Powered by Frappe" footer link specifically, plus
+  the navbar's own dropdown menus (user menu, help menu, app switcher) and
+  any currently-open modal (About dialog, etc.), walked in full. Scoped to
+  those structurally-chrome containers only, never a whole-page walk — a
+  menu or dialog can't contain arbitrary document data the way a list
+  view or form can, so this never touches a customer name or note that
+  happens to contain the word "ERPNext".
 
 This is best-effort, not exhaustive: the exact literal strings Frappe
 ships vary a little by version, and a handful of hard-coded email
@@ -124,9 +162,12 @@ update and running `bench migrate` runs the same sync via a patch (see
   one, since that would undermine the whole point of a validated set.
   Targeted by each module's public route (`/app/selling`, etc.) rather
   than sidebar DOM/class names, since those are far more likely to change
-  between Frappe versions (see the sidebar caveat below) — if a given
-  site's icons don't pick up color, it's a harmless no-op, not a broken
-  layout, and the module's text label is unaffected either way.
+  between Frappe versions (see the sidebar caveat below). Sets color on
+  the link AND fill on any nested `svg`/`use`/`path`, both `!important`,
+  since Frappe's icon component doesn't always rely on plain `currentColor`
+  inheritance — if a given site's icons still don't pick up color after
+  that, it's a harmless no-op, not a broken layout, and the module's text
+  label is unaffected either way.
 
 ### Advanced / Escape Hatch
 

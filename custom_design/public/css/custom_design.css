@@ -186,17 +186,17 @@ html.dark[data-cd-theme="on"] a {
    state and the frontend's "primary" badge variant. */
 html[data-cd-theme="on"] .indicator.blue,
 html[data-cd-theme="on"] .indicator-pill.blue {
-	background-color: var(--cd-active-bg);
+	background-color: var(--cd-active-bg) !important;
 }
 html[data-cd-theme="on"] .indicator-pill.blue {
-	color: var(--cd-accent);
+	color: var(--cd-accent) !important;
 }
 html.dark[data-cd-theme="on"] .indicator.blue,
 html.dark[data-cd-theme="on"] .indicator-pill.blue {
-	background-color: var(--cd-dark-active-bg);
+	background-color: var(--cd-dark-active-bg) !important;
 }
 html.dark[data-cd-theme="on"] .indicator-pill.blue {
-	color: var(--cd-dark-accent);
+	color: var(--cd-dark-accent) !important;
 }
 
 /* Cards, widgets, number cards, dashboards */
@@ -255,19 +255,72 @@ html.dark[data-cd-theme="on"] .indicator.red {
    reuse a hue (misleading) or fall outside the validated set, so any
    module past these 8 is left uncolored rather than guessing a 9th hue -
    the same "fold into Other" rule the palette validator itself applies. */
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] { color: #2a78d6; }
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] { color: #eb6834; }
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] { color: #1baf7a; }
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] { color: #eda100; }
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] { color: #e87ba4; }
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] { color: #008300; }
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] { color: #4a3aa7; }
-html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] { color: #e34948; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] { color: #3987e5; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] { color: #d95926; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] { color: #199e70; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] { color: #c98500; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] { color: #d55181; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] { color: #008300; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] { color: #9085e9; }
-html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] { color: #e66767; }
+/* !important + explicit svg/use/path targeting, not just `color` on the
+   link: Frappe's icon component sometimes sets fill on the <svg>/<use>
+   itself rather than purely inheriting currentColor from an ancestor, so
+   a plain (non-important) `color` on the <a> can lose to that. Setting
+   both color AND fill, !important, covers either mechanism. */
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] svg,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] use,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] path { color: #2a78d6 !important; fill: #2a78d6 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] svg,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] use,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] path { color: #eb6834 !important; fill: #eb6834 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] svg,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] use,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] path { color: #1baf7a !important; fill: #1baf7a !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] svg,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] use,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] path { color: #eda100 !important; fill: #eda100 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] svg,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] use,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] path { color: #e87ba4 !important; fill: #e87ba4 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] svg,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] use,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] path { color: #008300 !important; fill: #008300 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] svg,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] use,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] path { color: #4a3aa7 !important; fill: #4a3aa7 !important; }
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"],
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] svg,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] use,
+html[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] path { color: #e34948 !important; fill: #e34948 !important; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"],
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] svg,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] use,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/selling"] path { color: #3987e5 !important; fill: #3987e5 !important; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"],
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] svg,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] use,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/buying"] path { color: #d95926 !important; fill: #d95926 !important; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"],
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] svg,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] use,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/stock"] path { color: #199e70 !important; fill: #199e70 !important; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"],
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] svg,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] use,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/accounts"] path { color: #c98500 !important; fill: #c98500 !important; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"],
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] svg,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] use,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/crm"] path { color: #d55181 !important; fill: #d55181 !important; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"],
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] svg,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] use,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/assets"] path { color: #008300 !important; fill: #008300 !important; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"],
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] svg,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] use,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/projects"] path { color: #9085e9 !important; fill: #9085e9 !important; }
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"],
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] svg,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] use,
+html.dark[data-cd-theme="on"] [class*="sidebar"] a[href*="/app/support"] path { color: #e66767 !important; fill: #e66767 !important; }

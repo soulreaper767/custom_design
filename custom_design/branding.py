@@ -13,8 +13,15 @@ BRAND_REPLACEMENTS = {
 	"Frappe Framework": "{title}",
 	"Frappe Technologies": "{title}",
 	"Frappe Cloud": "{title}",
+	"Frappe School": "{title} School",
+	"Frappe Forum": "{title} Forum",
+	"Frappe Support": "{title} Support",
+	"About Frappe": "About {title}",
 	"Powered by Frappe": "Powered by {title}",
 	"Built on Frappe Framework": "Built on {title}",
+	"Open Source Applications for the Enterprise": "{title}",
+	"100% Open Source": "{title}",
+	"The world's #1 open source ERP": "{title}",
 }
 
 
@@ -84,6 +91,33 @@ def _sync_translations(enabled, title):
 	# after_install elsewhere in this app) busts the cached per-language
 	# translation dict too, so a dedicated cache-clear call isn't needed
 	# here specifically.
+
+
+def seed_default_sidebar_override(settings=None, app_title=None):
+	"""Adds one starter Sidebar Link Override - renaming "Frappe HR" to
+	"<Application Name> Teams" - if the table is still empty. This is a
+	helpful starting point, not a rule this app enforces: it's a normal,
+	admin-editable/deletable row like any other, seeded once via
+	after_install / the seed_default_sidebar_override patch, never
+	re-applied afterwards (unlike the Translation sync, which is only
+	safe to redo because it's an exact upsert - this would otherwise
+	re-add itself after an admin deletes it). Silently does nothing if a
+	site has no item with that exact visible label (e.g. no HRMS app
+	installed) - the override matcher just never finds it.
+
+	Returns True if a row was appended (caller decides when to save,
+	since after_install already saves the same settings doc once for
+	chart_colors too)."""
+	settings = settings or frappe.get_single("Design Settings")
+	if settings.sidebar_overrides:
+		return False
+
+	title = (app_title or settings.app_title or "").strip()
+	if not title:
+		return False
+
+	settings.append("sidebar_overrides", {"match_label": "Frappe HR", "new_label": f"{title} Teams"})
+	return True
 
 
 def _sync_email_footer(enabled, title):

@@ -1,3 +1,5 @@
 # Patches for custom_design app
 # Format: module.folder.file_name  (executed in order, top to bottom)
 custom_design.patches.v1_0.sync_brand_translations
+custom_design.patches.v1_1.reset_stale_color_defaults
+custom_design.patches.v1_2.seed_default_sidebar_override

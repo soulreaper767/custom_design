@@ -59,13 +59,20 @@
 
 		document.title = replaceBrandWords(document.title, title);
 
-		// Scoped to known branding/chrome locations only - never a
-		// document-wide text walk - so a record whose own name or notes
-		// happen to contain the word "Frappe"/"ERPNext" is never rewritten.
-		// Anything already routed through Frappe's own __() translation
-		// layer is handled server-side (see custom_design.branding); this
-		// is a client-side safety net for chrome that isn't, like the
-		// "Powered by Frappe" footer link.
+		// Two tiers of scope, both safe because they're structurally chrome -
+		// neither can ever contain arbitrary document/record data:
+		//   1. A curated list of specific known branding elements (footer
+		//      links, the "powered by" badge) - narrow and precise.
+		//   2. Whole containers that are chrome by construction - the
+		//      navbar's own dropdown menus (user menu, help menu, app
+		//      switcher) and any currently-open modal (About dialog, etc.),
+		//      walked in full since nothing in a menu or dialog is ever a
+		//      customer/record's own data the way a list view or form is.
+		// Never a document-wide walk of document.body itself - that's the
+		// one thing that would risk rewriting a business record that
+		// happens to contain the word "Frappe"/"ERPNext". Anything already
+		// routed through Frappe's own __() translation layer is handled
+		// server-side instead (see custom_design.branding).
 		const chromeSelectors = [
 			"a[href*='frappe.io']",
 			"a[href*='frappecloud.com']",
@@ -73,17 +80,31 @@
 			".frappe-powered-by",
 		].join(", ");
 
-		document.querySelectorAll(chromeSelectors).forEach((el) => {
-			["data-original-title", "title"].forEach((attr) => {
+		const chromeContainers = [
+			".navbar .dropdown-menu",
+			"#help-menu",
+			".modal.show",
+			".modal.in",
+		].join(", ");
+
+		const targets = new Set([
+			...document.querySelectorAll(chromeSelectors),
+			...document.querySelectorAll(chromeContainers),
+		]);
+
+		targets.forEach((el) => {
+			["data-original-title", "title", "aria-label"].forEach((attr) => {
 				const val = el.getAttribute(attr);
 				if (val) el.setAttribute(attr, replaceBrandWords(val, title));
 			});
 
-			Array.prototype.slice.call(el.childNodes).forEach((node) => {
-				if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+			const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+			let node;
+			while ((node = walker.nextNode())) {
+				if (node.textContent.trim()) {
 					node.textContent = replaceBrandWords(node.textContent, title);
 				}
-			});
+			}
 		});
 	}
 

@@ -37,8 +37,37 @@
 	background: var(--ws-bg);
 }
 
+/* webshop's grid.js (product_ui/grid.js) appends each card as a plain
+   ".col-sm-4.item-card" div directly into #product-listing - with no
+   ".row" ancestor to supply Bootstrap's flex/wrap context, those divs
+   just stack as ordinary block elements, one per line, regardless of
+   their 33% width. CSS Grid here replaces that missing context entirely
+   and gives predictable, industry-standard 3/2/1 column breakpoints
+   instead of depending on Bootstrap's column math. */
 #product-listing.item-card-group-section {
 	padding-top: 4px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 28px 24px;
+}
+
+#product-listing.item-card-group-section .item-card {
+	width: auto;
+	max-width: none;
+	flex: none;
+	margin-bottom: 0;
+}
+
+@media (max-width: 991px) {
+	#product-listing.item-card-group-section {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 575px) {
+	#product-listing.item-card-group-section {
+		grid-template-columns: 1fr;
+	}
 }
 
 /* ---------- Sidebar filters (#product-filters) ---------- */
@@ -102,10 +131,6 @@
 }
 
 /* ---------- Product grid cards ---------- */
-
-.item-card {
-	margin-bottom: 24px;
-}
 
 .item-card .card {
 	height: 100%;
@@ -253,6 +278,63 @@
 	letter-spacing: 0.04em;
 	color: var(--ws-text-muted);
 	margin-bottom: 16px;
+}
+
+/* ---------- Generic Bootstrap chrome webshop reuses as-is ---------- */
+/* Scoped to the storefront's own containers, not applied site-wide, so
+   this can't bleed into unrelated website pages (contact forms etc.)
+   that also happen to use plain Bootstrap buttons/links. */
+
+#product-listing,
+#product-filters,
+.product-container,
+.item-breadcrumbs {
+	--bs-primary: var(--ws-primary);
+}
+
+#product-listing .btn-primary,
+#product-filters .btn-primary,
+.product-container .btn-primary,
+.btn-prev,
+.btn-next {
+	background: var(--ws-primary);
+	border-color: var(--ws-primary);
+}
+
+#product-listing .btn-primary:hover,
+#product-filters .btn-primary:hover,
+.product-container .btn-primary:hover,
+.btn-prev:hover,
+.btn-next:hover {
+	background: var(--ws-primary-dark);
+	border-color: var(--ws-primary-dark);
+}
+
+.item-breadcrumbs a,
+#product-listing a,
+.product-container a:not(.btn) {
+	color: var(--ws-primary);
+}
+
+.item-breadcrumbs a:hover,
+#product-listing a:hover,
+.product-container a:not(.btn):hover {
+	color: var(--ws-primary-dark);
+}
+
+/* ---------- Search bar ---------- */
+
+#search-box,
+.search-box input {
+	border: 1px solid var(--ws-border);
+	border-radius: 8px;
+}
+
+#search-box:focus,
+.search-box input:focus {
+	border-color: var(--ws-primary);
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
 }
 
 /* ---------- Mobile filter toggle balance ---------- */

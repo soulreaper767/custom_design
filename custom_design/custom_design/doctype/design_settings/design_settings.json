@@ -82,7 +82,7 @@
   },
   {
    "default": "Tijarat",
-   "description": "Also used to replace the words \"Frappe\"/\"ERPNext\" with this name across page titles, tooltips, the \"Powered by\" footer, and outgoing system emails - applied on save, no separate action needed.",
+   "description": "Also replaces \"ERPNext\" with this name, and \"Frappe\"/\"Frappe HR\" with this name + \"OS\" (e.g. \"TijaratOS\"), across page titles, tooltips, the \"Powered by\" footer, and outgoing system emails - applied on save, no separate action needed.",
    "fieldname": "app_title",
    "fieldtype": "Data",
    "label": "Application Name"

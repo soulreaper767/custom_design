@@ -7,3 +7,5 @@ custom_design.patches.v1_3.resync_brand_translations
 custom_design.patches.v1_4.sync_login_and_module_labels
 custom_design.patches.v1_5.migrate_color_scheme_mode
 custom_design.patches.v1_6.configure_webshop_storefront
+custom_design.patches.v1_7.resync_platform_vs_product_branding
+custom_design.patches.v1_8.simplify_user_menu

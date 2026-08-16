@@ -13,6 +13,13 @@ import frappe
 # added the normal way, via Desk > Translation, without touching this app
 # at all.
 #
+# Two distinct target strings, not one: "ERPNext" (the product) becomes
+# the plain Application Name (e.g. "Tijarat"), while "Frappe"/"Frappe HR"
+# (the underlying platform/framework) becomes that name + "OS" (e.g.
+# "TijaratOS") - {title} and {platform} below, filled in by
+# _sync_translations. "HRMS" is included alongside "Frappe HR" since HR
+# module page titles/notifications use either depending on version.
+#
 # Deliberately NOT included: the About dialog's copyright line ("Frappe
 # Technologies Pvt. Ltd. and contributors"). That's a legal attribution
 # naming who actually holds copyright on the underlying framework code,
@@ -20,19 +27,21 @@ import frappe
 # authorship, which is a different thing entirely from repainting "Powered
 # by" chrome. Leave it alone even if extending this list later.
 BRAND_REPLACEMENTS = {
-	"Frappe": "{title}",
+	"Frappe": "{platform}",
 	"ERPNext": "{title}",
-	"Frappe Framework": "{title}",
-	"Frappe Technologies": "{title}",
-	"Frappe Cloud": "{title}",
-	"Frappe School": "{title} School",
-	"Frappe Forum": "{title} Forum",
-	"Frappe Support": "{title} Support",
-	"Frappe Framework Version": "{title} Version",
-	"About Frappe": "About {title}",
-	"Powered by Frappe": "Powered by {title}",
-	"Built on Frappe Framework": "Built on {title}",
-	"Open Source applications for the web.": "{title}",
+	"Frappe Framework": "{platform}",
+	"Frappe Technologies": "{platform}",
+	"Frappe Cloud": "{platform}",
+	"Frappe School": "{platform} School",
+	"Frappe Forum": "{platform} Forum",
+	"Frappe Support": "{platform} Support",
+	"Frappe Framework Version": "{platform} Version",
+	"About Frappe": "About {platform}",
+	"Powered by Frappe": "Powered by {platform}",
+	"Built on Frappe Framework": "Built on {platform}",
+	"Open Source applications for the web.": "{platform}",
+	"Frappe HR": "{platform} HR",
+	"HRMS": "{platform} HR",
 }
 
 
@@ -87,8 +96,10 @@ def _sync_translations(enabled, title):
 	if "en" not in languages:
 		languages.append("en")
 
+	platform = f"{title}OS" if title else ""
+
 	for source, template in BRAND_REPLACEMENTS.items():
-		translated = template.format(title=title) if enabled else None
+		translated = template.format(title=title, platform=platform) if enabled else None
 		for lang in languages:
 			existing = frappe.db.get_value(
 				"Translation", {"source_text": source, "language": lang}, "name"

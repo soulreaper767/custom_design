@@ -13,8 +13,11 @@ app_include_js = "/assets/custom_design/js/custom_design.js"
 # separate hook from app_include_*, which never reaches these pages at
 # all. login.js/login.css no-op on anything that isn't actually the login
 # page (detected via Frappe's own .for-login wrapper class), so loading
-# them site-wide for website pages is harmless.
-web_include_css = "/assets/custom_design/css/login.css"
+# them site-wide for website pages is harmless. webshop.css is scoped the
+# same way, by CSS selector rather than a JS guard - its rules only match
+# elements that exist on webshop's own pages (#product-filters, .item-card,
+# .product-container, etc.), so it's equally inert everywhere else.
+web_include_css = ["/assets/custom_design/css/login.css", "/assets/custom_design/css/webshop.css"]
 web_include_js = "/assets/custom_design/js/login.js"
 
 # Injects Design Settings into frappe.boot.custom_design so the theme is

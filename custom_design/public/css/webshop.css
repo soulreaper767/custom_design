@@ -1,0 +1,269 @@
+/* custom_design: storefront theme for the webshop app's public pages
+   (/all-products, /shop-by-category, and individual item detail pages).
+
+   Website pages render outside the Desk app entirely, so they never pick
+   up custom_design.css (that file is app_include_css, Desk-only - see its
+   own header comment) or the live --cd-* values custom_design.js reads
+   from Design Settings. This file is loaded via web_include_css instead
+   and hard-codes the same brand palette as a static fallback, since there
+   is no equivalent "inject Design Settings before first paint" hook on
+   the website rendering path. If Design Settings' colors are changed,
+   these values should be updated to match by hand.
+
+   Selectors below are verified against webshop's actual templates
+   (frappe/webshop, develop branch: www/all-products/index.html,
+   templates/generators/item/*.html, templates/includes/macros.html) -
+   not guessed. */
+
+:root {
+	--ws-primary: #4f46e5;
+	--ws-primary-dark: #4338ca;
+	--ws-success: #047857;
+	--ws-danger: #b91c1c;
+	--ws-text: #0f172a;
+	--ws-text-muted: #64748b;
+	--ws-border: #e2e8f0;
+	--ws-bg: #f8fafc;
+	--ws-card-bg: #ffffff;
+	--ws-radius: 10px;
+	--ws-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	--ws-shadow-hover: 0 12px 24px -8px rgba(15, 23, 42, 0.14);
+}
+
+/* ---------- Page-wide balance ---------- */
+
+.website-container,
+.page_content_container {
+	background: var(--ws-bg);
+}
+
+#product-listing.item-card-group-section {
+	padding-top: 4px;
+}
+
+/* ---------- Sidebar filters (#product-filters) ---------- */
+
+#product-filters {
+	background: var(--ws-card-bg);
+	border: 1px solid var(--ws-border);
+	border-radius: var(--ws-radius);
+	padding: 20px 18px;
+	position: sticky;
+	top: 88px;
+}
+
+#product-filters .filter-block {
+	padding-bottom: 20px !important;
+	margin-bottom: 20px !important;
+	border-bottom: 1px solid var(--ws-border);
+}
+
+#product-filters .filter-block:last-child {
+	border-bottom: none;
+	margin-bottom: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+#product-filters .filter-label {
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--ws-text);
+	margin-bottom: 14px !important;
+}
+
+#product-filters .filter-lookup-wrapper.checkbox {
+	margin-bottom: 9px;
+	font-size: 14px;
+	color: var(--ws-text-muted);
+}
+
+#product-filters .filter-lookup-wrapper.checkbox label {
+	cursor: pointer;
+}
+
+#product-filters .product-filter {
+	accent-color: var(--ws-primary);
+	cursor: pointer;
+}
+
+#product-filters .filter-lookup-input {
+	border: 1px solid var(--ws-border);
+	border-radius: 8px;
+	font-size: 13px;
+	padding: 6px 10px;
+}
+
+#product-filters .filter-lookup-input:focus {
+	border-color: var(--ws-primary);
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+/* ---------- Product grid cards ---------- */
+
+.item-card {
+	margin-bottom: 24px;
+}
+
+.item-card .card {
+	height: 100%;
+	border: 1px solid var(--ws-border);
+	border-radius: var(--ws-radius);
+	box-shadow: var(--ws-shadow);
+	overflow: hidden;
+	transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.item-card .card:hover {
+	box-shadow: var(--ws-shadow-hover);
+	transform: translateY(-3px);
+	border-color: rgba(79, 70, 229, 0.25);
+}
+
+.item-card .card-img-container {
+	background: var(--ws-bg);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 1 / 1;
+	overflow: hidden;
+}
+
+.item-card .card-img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	padding: 12px;
+}
+
+.item-card .card-body {
+	padding: 14px 16px 16px;
+}
+
+.item-card .product-category {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	color: var(--ws-primary);
+	margin-bottom: 4px;
+}
+
+.item-card .product-title {
+	font-size: 14.5px;
+	font-weight: 600;
+	line-height: 1.35;
+	color: var(--ws-text);
+}
+
+.item-card.featured-item .card {
+	border-color: rgba(79, 70, 229, 0.35);
+}
+
+/* ---------- Item detail page ---------- */
+
+.item-breadcrumbs {
+	font-size: 13px;
+	color: var(--ws-text-muted);
+	margin-bottom: 20px;
+}
+
+.product-container {
+	background: var(--ws-card-bg);
+	border: 1px solid var(--ws-border);
+	border-radius: var(--ws-radius);
+	padding: 32px;
+}
+
+.product-details .product-title {
+	font-size: 26px;
+	font-weight: 700;
+	color: var(--ws-text);
+	line-height: 1.3;
+}
+
+.product-details .product-code {
+	color: var(--ws-text-muted);
+	font-size: 13px;
+	margin-top: 6px;
+}
+
+.product-price {
+	font-size: 24px;
+	font-weight: 700;
+	color: var(--ws-text);
+	margin: 16px 0;
+}
+
+.has-stock.in-green {
+	color: var(--ws-success);
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.no-stock.out-of-stock {
+	color: var(--ws-danger);
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.product-description {
+	color: var(--ws-text-muted);
+	line-height: 1.7;
+	margin-top: 20px;
+}
+
+.btn-add-to-cart {
+	background: var(--ws-primary);
+	border-color: var(--ws-primary);
+	border-radius: 8px;
+	font-weight: 600;
+	padding: 10px 22px;
+	transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.btn-add-to-cart:hover {
+	background: var(--ws-primary-dark);
+	border-color: var(--ws-primary-dark);
+	transform: translateY(-1px);
+}
+
+.btn-view-in-cart {
+	border-radius: 8px;
+	font-weight: 600;
+}
+
+.product-specification-label,
+.category-tabs .nav-link {
+	color: var(--ws-text);
+	font-weight: 600;
+}
+
+.category-tabs .nav-link.active {
+	color: var(--ws-primary);
+	border-color: var(--ws-primary);
+}
+
+.recommended-item-section .recommendation-header {
+	font-size: 13px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--ws-text-muted);
+	margin-bottom: 16px;
+}
+
+/* ---------- Mobile filter toggle balance ---------- */
+
+@media (max-width: 767px) {
+	#product-filters {
+		position: static;
+		margin-bottom: 20px;
+	}
+
+	.product-container {
+		padding: 20px;
+	}
+}

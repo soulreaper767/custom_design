@@ -6,3 +6,4 @@ custom_design.patches.v1_2.seed_default_sidebar_override
 custom_design.patches.v1_3.resync_brand_translations
 custom_design.patches.v1_4.sync_login_and_module_labels
 custom_design.patches.v1_5.migrate_color_scheme_mode
+custom_design.patches.v1_6.configure_webshop_storefront
